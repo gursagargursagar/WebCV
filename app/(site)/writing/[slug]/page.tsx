@@ -1,5 +1,4 @@
 import { siteNow } from '@/core/content/now';
-import { atLeastOne, SHELL_SLUG } from '@/core/pages/static-params';
 import type { Metadata } from 'next';
 import type { Article, WithContext } from 'schema-dts';
 import { notFound } from 'next/navigation';

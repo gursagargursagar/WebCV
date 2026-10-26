@@ -3,6 +3,7 @@ import { cache } from 'react';
 import type { CMSState } from '@/cms/types/cms';
 import { INITIAL_CMS_STATE } from '@/cms/data/initialData';
 import { getStorageAdapter } from '@/core/storage/registry';
+import { NoSiteError } from '@/core/site/tenant';
 import type { Channel } from '@/core/storage/contract';
 import { caseStudyToProject, mergeWork } from './work';
 
@@ -21,7 +22,11 @@ async function readPublished(): Promise<CMSState> {
     const stored = await (await getStorageAdapter()).readSnapshot('published');
     if (stored) return stored;
   } catch (err) {
-    console.error('[content] Could not read published content; serving the seed.', err);
+    // WebCV's own pages (front page, sign-up, sign-in) have no portfolio and
+    // render on the seed by design; only a real failure is worth a log line.
+    if (!(err instanceof NoSiteError)) {
+      console.error('[content] Could not read published content; serving the seed.', err);
+    }
   }
   return INITIAL_CMS_STATE;
 }
@@ -87,7 +92,9 @@ export const getContentForChannel = cache(async (channel: Channel): Promise<CMSS
     const stored = await (await getStorageAdapter()).readSnapshot('draft');
     if (stored) return stored;
   } catch (err) {
-    console.error('[content] Could not read the draft; falling back to what is published.', err);
+    if (!(err instanceof NoSiteError)) {
+      console.error('[content] Could not read the draft; falling back to what is published.', err);
+    }
   }
   // Read fresh, never through the cache: the draft channel is what the editors
   // open and what their saves are checked against, and a cached copy — up to

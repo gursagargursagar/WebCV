@@ -27,6 +27,8 @@ import { THEME_STORAGE_KEY } from '@/context/themeConstants';
 import '@/styles/layers.css';
 
 import '@/styles/index.css';
+// WebCV's own skin (platform pages and admin). Scoped to `.scai`; see the file.
+import '@/styles/scai.css';
 
 // WebCV serves many portfolios from one set of routes, chosen per request by
 // the proxy, so no page may be rendered once and shared.
@@ -129,6 +131,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     <html
       lang={siteLanguage(content.settings)}
       data-theme="dark"
+      // Lets a theme carry a few shape rules the token system cannot
+      // express — see the Swiss Cheese rules in src/styles/scai.css.
+      data-preset={appearance.preset.id}
       className={`dark ${ALL_FONT_VARIABLES}`}
       suppressHydrationWarning
     >

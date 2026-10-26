@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-import '@fontsource-variable/inter';
 import './platform.css';
 import { Foot, TopBar } from './chrome';
 
@@ -30,7 +29,9 @@ export const metadata: Metadata = {
 /** The platform's own pages: the front page and sign-up. Portfolios never render here. */
 export default function PlatformLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="wc">
+    // `.scai` gives these pages the shared Swiss Cheese AI tokens; `.wc` is the
+    // platform's own layout (platform.css).
+    <div className="scai wc">
       <TopBar />
       {children}
       <Foot />

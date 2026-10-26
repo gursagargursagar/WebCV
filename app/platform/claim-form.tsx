@@ -1,46 +1,48 @@
 'use client';
 
 import { useState } from 'react';
-import { useSlugCheck, normaliseSlug } from './use-slug-check';
+import { normaliseSlug, useSlugCheck } from './use-slug-check';
 
-/** The front page's address check. Hands the slug on to the sign-up form. */
+/**
+ * The hero's address check, laid out as SCAI's endpoint bar: label, the
+ * address being typed, and one black button. Hands the slug to sign-up.
+ */
 export function ClaimForm() {
   const [slug, setSlug] = useState('');
   const check = useSlugCheck(slug);
+  const blocked = check.state === 'taken' || check.state === 'invalid';
 
   return (
     <form
+      className="wc-claim"
       action="/signup"
       method="get"
       onSubmit={(e) => {
-        if (check.state === 'taken' || check.state === 'invalid') e.preventDefault();
+        if (blocked) e.preventDefault();
       }}
-      style={{ display: 'flex', flexDirection: 'column', gap: 10 }}
     >
-      <div className="wc-field">
-        <label htmlFor="claim-slug">Your address</label>
-        <div className="wc-affix">
-          <span>webcv.au/</span>
-          <input
-            id="claim-slug"
-            name="slug"
-            className="wc-input"
-            placeholder="your-name"
-            autoComplete="off"
-            autoCapitalize="none"
-            spellCheck={false}
-            value={slug}
-            onChange={(e) => setSlug(normaliseSlug(e.target.value))}
-            aria-describedby="claim-hint"
-          />
-        </div>
-        <span id="claim-hint" className={`wc-hint ${check.tone}`} aria-live="polite">
-          {check.message}
-        </span>
+      <label htmlFor="claim-slug">Claim your address</label>
+      <div className="wc-claim-field">
+        <span aria-hidden>webcv.au/</span>
+        <input
+          id="claim-slug"
+          name="slug"
+          placeholder="your-name"
+          autoComplete="off"
+          autoCapitalize="none"
+          spellCheck={false}
+          value={slug}
+          onChange={(e) => setSlug(normaliseSlug(e.target.value))}
+          aria-describedby="claim-hint"
+          aria-invalid={blocked || undefined}
+        />
       </div>
-      <button type="submit" className="wc-btn primary">
-        Continue
+      <button type="submit" className="wc-button" disabled={blocked}>
+        Continue <span aria-hidden>→</span>
       </button>
+      <p id="claim-hint" className={`wc-claim-hint ${check.tone}`} aria-live="polite">
+        {slug ? check.message : 'Lowercase letters, numbers and hyphens. You can check it now.'}
+      </p>
     </form>
   );
 }

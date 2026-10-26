@@ -1,7 +1,12 @@
 'use client';
 
 import { useState } from 'react';
-import { DEFAULT_THEME_ID, THEME_PRESETS } from '@/core/theme/presets';
+import {
+  DEFAULT_THEME_ID,
+  THEME_PRESETS,
+  getThemePreset,
+  type ThemePreset,
+} from '@/core/theme/presets';
 import { applyThemeChoice, listThemeOverrides } from '@/core/theme/overrides';
 import { GOOGLE_FONTS_LIST } from '@/utils/googleFonts';
 import type { AppearanceSettings } from '@/cms/types/cms';
@@ -10,13 +15,22 @@ import { ConflictNotice } from '../_components/conflict-notice';
 import { useSaveShortcut, useUnsavedChanges } from '../_components/unsaved-changes';
 import { UnsavedNote } from '../_components/unsaved-note';
 
-const COLOR_FIELDS: { field: keyof AppearanceSettings; label: string; fallback: string }[] = [
-  { field: 'accentDark', label: 'Accent — dark mode', fallback: '#35F2B3' },
-  { field: 'accentLight', label: 'Accent — light mode', fallback: '#00B97D' },
-  { field: 'backgroundDark', label: 'Background — dark mode', fallback: '#0D0F0F' },
-  { field: 'backgroundLight', label: 'Background — light mode', fallback: '#F3F3EF' },
-  { field: 'strokeDark', label: 'Border — dark mode', fallback: '#1B1B1B' },
-  { field: 'strokeLight', label: 'Border — light mode', fallback: '#DADADA' },
+/**
+ * The six colours a person can override. An empty field means "the theme's
+ * value", so the placeholder and the swatch show the chosen theme's colour —
+ * these used to be the Editorial theme's, hard-coded, which made every other
+ * theme look as if it had been overridden with mint green.
+ */
+const COLOR_FIELDS: {
+  field: keyof ThemePreset['colours'] & keyof AppearanceSettings;
+  label: string;
+}[] = [
+  { field: 'accentDark', label: 'Accent — dark mode' },
+  { field: 'accentLight', label: 'Accent — light mode' },
+  { field: 'backgroundDark', label: 'Background — dark mode' },
+  { field: 'backgroundLight', label: 'Background — light mode' },
+  { field: 'strokeDark', label: 'Border — dark mode' },
+  { field: 'strokeLight', label: 'Border — light mode' },
 ];
 
 const QUICK_PRESETS: { name: string; accentDark: string; accentLight: string; bgDark: string }[] = [
@@ -79,6 +93,7 @@ export function AppearanceForm({
   };
 
   const currentTheme = appearance.themeId ?? DEFAULT_THEME_ID;
+  const themePreset = getThemePreset(currentTheme);
 
   const save = async () => {
     setBusy(true);
@@ -229,8 +244,9 @@ export function AppearanceForm({
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2">
-          {COLOR_FIELDS.map(({ field: key, label, fallback }) => {
+          {COLOR_FIELDS.map(({ field: key, label }) => {
             const value = (appearance[key] as string | undefined) ?? '';
+            const fallback = themePreset.colours[key];
             return (
               <div key={key} className="grid gap-2 rounded-xl border border-border p-3">
                 <span className="text-sm text-text-muted">{label}</span>
@@ -264,11 +280,16 @@ export function AppearanceForm({
           <label className="grid gap-1 text-sm">
             <span className="font-semibold">Heading font</span>
             <select
-              value={appearance.displayFontFamily || 'Instrument Serif'}
+              value={appearance.displayFontFamily || ''}
               onChange={(event) => set('displayFontFamily', event.target.value)}
               className={field}
               style={{ minHeight: 44 }}
             >
+              <option value="">
+                {themePreset.fonts.display
+                  ? `Theme default (${themePreset.fonts.display})`
+                  : 'Theme default (Georgia, system serif)'}
+              </option>
               {FONT_OPTIONS.map((option) => (
                 <option key={option.value} value={option.value}>
                   {option.label}
@@ -279,11 +300,12 @@ export function AppearanceForm({
           <label className="grid gap-1 text-sm">
             <span className="font-semibold">Body font</span>
             <select
-              value={appearance.bodyFontFamily || 'Geist'}
+              value={appearance.bodyFontFamily || ''}
               onChange={(event) => set('bodyFontFamily', event.target.value)}
               className={field}
               style={{ minHeight: 44 }}
             >
+              <option value="">{`Theme default (${themePreset.fonts.body || 'system sans-serif'})`}</option>
               {FONT_OPTIONS.map((option) => (
                 <option key={option.value} value={option.value}>
                   {option.label}

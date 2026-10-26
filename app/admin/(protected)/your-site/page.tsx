@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { getPublishedContentFresh } from '@/core/content/read';
 import { resolveSiteUrl } from '@/core/content/metadata';
 import { CopyAddress } from './copy-address';
+import { isMultiSite } from '@/core/site/constants';
 
 export const metadata: Metadata = {
   title: 'Your site',
@@ -85,13 +86,16 @@ export default async function YourSitePage() {
     url && /\.(vercel\.app|netlify\.app|pages\.dev)$/i.test(new URL(url).hostname)
   );
   const hasPublished = Boolean(content.lastPublishedAt);
+  const multi = isMultiSite();
 
   return (
     <div className="grid gap-5" style={{ maxWidth: 'var(--measure)' }}>
       <div>
         <h1 className="font-display m-0 text-3xl">Your site</h1>
         <p className="m-0 mt-1 text-text-secondary">
-          The address to put on your CV, and how to swap it for one of your own.
+          {multi
+            ? 'The address to put on your CV and share with people.'
+            : 'The address to put on your CV, and how to swap it for one of your own.'}
         </p>
       </div>
 
@@ -120,7 +124,20 @@ export default async function YourSitePage() {
 
       <hr className="border-border" />
 
-      {isPlatformSubdomain === false && url ? (
+      {multi ? (
+        // WebCV hosts every portfolio at webcv.au/<name>; domains, hosts and
+        // OPB_SITE_URL are the platform's business, not the owner's.
+        <div className="grid gap-3">
+          <p className="m-0">
+            <strong>Sharing it.</strong> Put this address on your CV, your LinkedIn profile and your
+            email signature. It stays the same every time you publish.
+          </p>
+          <p className="m-0 text-sm text-text-secondary">
+            Changes you make in the editor are private until you press Publish, so the address only
+            ever shows what you have chosen to show.
+          </p>
+        </div>
+      ) : isPlatformSubdomain === false && url ? (
         <Notice kind="success" title="You are already on your own domain">
           Nothing further to do. If you ever move it, remember to update OPB_SITE_URL so links
           inside emails follow.

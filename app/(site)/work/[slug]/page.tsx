@@ -1,9 +1,8 @@
 import { siteNow } from '@/core/content/now';
-import { atLeastOne, SHELL_SLUG } from '@/core/pages/static-params';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { buildMetadata } from '@/core/content/metadata';
-import { getContentForChannel, getProjectBySlug, getPublishedProjects } from '@/core/content/read';
+import { getContentForChannel, getProjectBySlug } from '@/core/content/read';
 import { publicView } from '@/core/content/sanitise';
 import { currentChannel } from '@/core/pages/read';
 import { BlockList } from '@/core/blocks/registry';

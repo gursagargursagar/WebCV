@@ -9,6 +9,7 @@ import { MAX_EMAIL_LENGTH } from '@/core/email/send';
 import { isMultiSite, isValidSlug } from '@/core/site/constants';
 import { registerSite, siteByEmail, siteBySlug } from '@/core/site/registry';
 import { runWithSite } from '@/core/site/tenant';
+import { WEBCV_THEME_ID } from '@/core/theme/presets';
 import { getStorageAdapter } from '@/core/storage/registry';
 import { hasDatabase } from '@/core/storage/adapters/webcv';
 
@@ -46,7 +47,7 @@ export async function POST(req: Request) {
   }
 
   const limit = await runWithSite(PLATFORM, async () =>
-    rateLimit(`signup:${await clientKey()}`, 5, 60 * 60)
+    rateLimit(`signup:${await clientKey()}`, 10, 60 * 60)
   );
   if (!limit.allowed) {
     return NextResponse.json(
@@ -91,6 +92,16 @@ export async function POST(req: Request) {
     const now = new Date().toISOString();
     const seed: CMSState = structuredClone(INITIAL_CMS_STATE);
     seed.settings = { ...seed.settings, fullName: name, email, siteUrl: siteUrlFor(req, slug) };
+    // New portfolios start on WebCV's own look; the owner can change it in Appearance.
+    seed.appearance = { ...seed.appearance, themeId: WEBCV_THEME_ID };
+    // WebCV knows the address and the owner's name, so the search-engine basics
+    // start filled in rather than as dashboard warnings.
+    seed.seo = {
+      ...seed.seo,
+      canonicalUrl: siteUrlFor(req, slug),
+      siteTitle: `${name} — Portfolio`,
+      author: name,
+    };
     seed.lastSavedAt = now;
     seed.lastPublishedAt = now;
 

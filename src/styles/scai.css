@@ -1,0 +1,231 @@
+/*
+ * Swiss Cheese AI — the WebCV platform skin.
+ *
+ * The palette, type and geometry of swisscheeseai.au, applied to everything
+ * WebCV itself draws: the front page, sign-up and sign-in, and the whole admin.
+ * Portfolios are not wrapped in `.scai`; they keep the theme their owner picks
+ * (new ones start on the matching "Swiss Cheese" preset in core/theme/presets).
+ *
+ * Applied by putting `.scai` on a wrapper. `:root:has(.scai)` re-points the
+ * same CSS variables the admin's Tailwind tokens already read, so every admin
+ * screen changes without touching its markup, and it outranks the site
+ * appearance stylesheet the root layout prints (`:root[data-theme]` is 0,2,0;
+ * these are 0,3,0) — the admin no longer turns pink because a portfolio did.
+ *
+ * Source of truth: gursagargursagar/scai-website, index.html `:root`.
+ *   black #050505 · ink #09090a · panel #111113 · raised #171719
+ *   paper #f5f3f2 · muted #aaa6ad · violet #594d63 · cyan #20c4dc
+ *   Georgia headlines, Inter text, SF Mono labels, 4px corners, 1px rules.
+ */
+
+/* ---------------------------------------------------------------- dark */
+:root:has(.scai),
+:root[data-theme='dark']:has(.scai),
+:root.dark:has(.scai) {
+  --scai-black: #050505;
+  --scai-ink: #09090a;
+  --scai-panel: #111113;
+  --scai-raised: #171719;
+  --scai-paper: #f5f3f2;
+  --scai-violet: #594d63;
+  --scai-cyan: #20c4dc;
+
+  --bg-primary: #050505;
+  --surface-primary: #09090a;
+  --surface-secondary: #111113;
+  --surface-raised: #171719;
+  --surface-sunken: #030303;
+  --surface-overlay: rgb(5 5 5 / 0.88);
+  --text-primary: #f5f3f2;
+  --text-secondary: #aaa6ad;
+  /* SCAI's #77737a is 4.2:1 here; nudged to clear 4.5:1 for small labels. */
+  --text-muted: #8c8890;
+  --text-inverse: #050505;
+  --text-on-accent: #050505;
+  --border-color: #262628;
+  --border-subtle: #18181a;
+  --border-color-hover: #3c3b3f;
+  --border-strong: #55535a;
+  --accent-color: #20c4dc;
+  --accent-hover: #4fd3e6;
+  --accent-subtle: rgb(32 196 220 / 0.12);
+  --accent-muted: #0e4a53;
+  --accent-contrast: #050505;
+  --badge-bg: rgb(32 196 220 / 0.08);
+  --badge-border: rgb(32 196 220 / 0.3);
+  --btn-primary-bg: #f5f3f2;
+  --btn-primary-text: #050505;
+  --btn-primary-hover: #dcd9d7;
+  --btn-secondary-border: #2f2e32;
+  --btn-secondary-text: #f5f3f2;
+  --btn-secondary-hover: #161618;
+  --focus-ring: #20c4dc;
+  --selection-bg: #f5f3f2;
+  --selection-text: #050505;
+  --link-color: #20c4dc;
+  --danger: #ff8a80;
+  --danger-subtle: rgb(255 138 128 / 0.12);
+  --success: #5fd4a6;
+  --warning: #f2c063;
+
+  --section-hero: #050505;
+  --section-work: #050505;
+  --section-about: #09090a;
+  --section-capabilities: #050505;
+  --section-experience: #09090a;
+  --section-contact: #050505;
+  --section-footer: #030303;
+
+  --font-display: Georgia, 'Times New Roman', Times, serif;
+  --font-body: var(--font-inter), Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont,
+    'Segoe UI', Helvetica, Arial, sans-serif;
+  --font-sans: var(--font-body);
+  --font-mono: 'SFMono-Regular', ui-monospace, Consolas, 'Liberation Mono', Menlo, monospace;
+
+  --radius-sm: 2px;
+  --radius-md: 4px;
+  --radius-lg: 6px;
+
+  color-scheme: dark;
+}
+
+/* --------------------------------------------------------------- light */
+/* SCAI's white hero, carried across the whole surface: white page, paper
+   panels, ink type, black primary buttons. Cyan darkens to stay readable. */
+:root[data-theme='light']:has(.scai),
+:root.light:has(.scai) {
+  --bg-primary: #ffffff;
+  --surface-primary: #fbfaf9;
+  --surface-secondary: #f5f3f2;
+  --surface-raised: #ffffff;
+  --surface-sunken: #efedec;
+  --surface-overlay: rgb(255 255 255 / 0.9);
+  --text-primary: #080808;
+  --text-secondary: #3f3c42;
+  --text-muted: #5f5b63;
+  --text-inverse: #ffffff;
+  --text-on-accent: #ffffff;
+  --border-color: #dedbda;
+  --border-subtle: #ebe9e8;
+  --border-color-hover: #b9b6b8;
+  --border-strong: #111111;
+  --accent-color: #0a7182;
+  --accent-hover: #096b7a;
+  --accent-subtle: rgb(10 113 130 / 0.1);
+  --accent-muted: #bfe7ee;
+  --accent-contrast: #ffffff;
+  --badge-bg: rgb(10 113 130 / 0.08);
+  --badge-border: rgb(10 113 130 / 0.3);
+  --btn-primary-bg: #050505;
+  --btn-primary-text: #f5f3f2;
+  --btn-primary-hover: #262628;
+  --btn-secondary-border: #d4d1d0;
+  --btn-secondary-text: #080808;
+  --btn-secondary-hover: #f5f3f2;
+  --focus-ring: #0a7182;
+  --selection-bg: #050505;
+  --selection-text: #f5f3f2;
+  --link-color: #0a6f7f;
+  --danger: #b3261e;
+  --danger-subtle: rgb(179 38 30 / 0.08);
+  --success: #12795a;
+  --warning: #8a5a00;
+
+  --section-hero: #ffffff;
+  --section-work: #ffffff;
+  --section-about: #fbfaf9;
+  --section-capabilities: #ffffff;
+  --section-experience: #fbfaf9;
+  --section-contact: #ffffff;
+  --section-footer: #f5f3f2;
+
+  color-scheme: light;
+}
+
+/* ---------------------------------------------------- shared treatments */
+.scai {
+  /* Native controls (progress bars, checkboxes, radios, ranges) in SCAI cyan
+     rather than the browser's default blue or green. */
+  accent-color: var(--accent-color);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+.scai ::selection {
+  background: var(--selection-bg);
+  color: var(--selection-text);
+}
+
+/* SCAI headlines: Georgia, set tight. */
+.scai .font-display {
+  font-weight: 600;
+  letter-spacing: -0.03em;
+}
+
+/* Labels: SF Mono, small caps-style tracking. */
+.scai .font-mono.uppercase {
+  letter-spacing: 0.12em;
+}
+
+/* SCAI corners are 2–6px. The admin was written with soft 24px cards and
+   pill buttons; square them here rather than in a hundred class lists. Dots,
+   avatars and switches are not interactive text controls and keep their
+   shape. */
+.scai .rounded-2xl,
+.scai .rounded-3xl,
+.scai .rounded-xl {
+  border-radius: var(--radius-lg);
+}
+.scai .rounded-lg {
+  border-radius: var(--radius-md);
+}
+.scai :is(a, button, input, select, textarea, label, summary, [role='button']).rounded-full,
+.scai .rounded-full:has(> input),
+.scai span.rounded-full:not(:empty) {
+  border-radius: var(--radius-md);
+}
+
+/* One visible focus treatment everywhere: SCAI cyan, offset off the edge. */
+.scai :where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 3px;
+}
+
+/* Form fields: hairline border, recessed panel, cyan when active. */
+.scai :where(input:not([type='checkbox']):not([type='radio']):not([type='range']):not([type='color']), select, textarea) {
+  background-color: var(--surface-secondary);
+  border-color: var(--border-color);
+  color: var(--text-primary);
+}
+.scai :where(input, select, textarea)::placeholder {
+  color: var(--text-muted);
+}
+.scai :where(input:not([type='checkbox']):not([type='radio']), select, textarea):focus {
+  border-color: var(--accent-color);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scai *,
+  .scai *::before,
+  .scai *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}
+
+/* -------------------------------------------- Swiss Cheese portfolio theme */
+/* A portfolio on the Swiss Cheese preset gets the rest of the SCAI shape
+   language that tokens alone cannot carry: square controls and tight
+   Georgia headlines. Only that theme — owners on other themes keep theirs. */
+:root[data-preset='swiss-cheese'] :is(a, button, input, select, textarea, summary).rounded-full,
+:root[data-preset='swiss-cheese'] span.rounded-full:not(:empty) {
+  border-radius: var(--radius-md);
+}
+:root[data-preset='swiss-cheese'] .font-display {
+  font-weight: 600;
+  letter-spacing: -0.03em;
+}
+:root[data-preset='swiss-cheese'] :where(a, button, input, select, textarea, summary):focus-visible {
+  outline-color: var(--accent-color);
+}

@@ -47,6 +47,25 @@ export interface ThemePreset {
 
 export const THEME_PRESETS: ThemePreset[] = [
   {
+    id: 'swiss-cheese',
+    name: 'Swiss Cheese',
+    description: 'Georgia headlines, near-black and paper, one cyan accent. WebCV’s own look.',
+    // swisscheeseai.au's palette (gursagargursagar/scai-website). The display
+    // face is left empty on purpose: SCAI sets headlines in Georgia, a system
+    // serif every device already has, and an empty family falls through to
+    // the layout's `Georgia, serif` stack rather than downloading a lookalike.
+    colours: {
+      accentDark: '#20C4DC',
+      accentLight: '#0A7182',
+      backgroundDark: '#050505',
+      backgroundLight: '#FFFFFF',
+      strokeDark: '#262628',
+      strokeLight: '#DEDBDA',
+    },
+    layout: { density: 'comfortable', radius: 'sharp', typeScale: 'default' },
+    fonts: { display: '', body: 'Inter', mono: '' },
+  },
+  {
     id: 'editorial',
     name: 'Editorial',
     description: 'Serif headlines, generous space, quiet colour. The default.',
@@ -140,6 +159,9 @@ export const THEME_PRESETS: ThemePreset[] = [
     fonts: { display: 'Inter', body: 'Inter', mono: '' },
   },
 ];
+
+/** The theme a new WebCV portfolio starts on. */
+export const WEBCV_THEME_ID = 'swiss-cheese';
 
 export const DEFAULT_THEME_ID = 'editorial';
 

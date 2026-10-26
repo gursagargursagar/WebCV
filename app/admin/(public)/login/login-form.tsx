@@ -16,7 +16,19 @@ import Link from 'next/link';
 const field =
   'w-full rounded-xl border border-border bg-surface-primary px-3 text-text-primary outline-none focus:border-accent';
 
-export function LoginForm({ next, demoHint }: { next?: string; demoHint: string | null }) {
+export function LoginForm({
+  next,
+  demoHint,
+  showPasskey = true,
+  showEmailCode = true,
+}: {
+  next?: string;
+  demoHint: string | null;
+  /** False when a passkey cannot work here (WebCV, before this browser knows its portfolio). */
+  showPasskey?: boolean;
+  /** False when no mail server is configured, so a code could never arrive. */
+  showEmailCode?: boolean;
+}) {
   const [email, setEmail] = useState('');
   const [passphrase, setPassphrase] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -79,6 +91,7 @@ export function LoginForm({ next, demoHint }: { next?: string; demoHint: string 
    * it, or a site without passkeys, simply shows the form as before.
    */
   useEffect(() => {
+    if (!showPasskey) return;
     let cancelled = false;
     void (async () => {
       try {
@@ -231,9 +244,9 @@ export function LoginForm({ next, demoHint }: { next?: string; demoHint: string 
   return (
     <form onSubmit={(event) => void submit(event)} className="grid gap-5">
       <div>
-        <h1 className="font-display text-2xl font-semibold">Sign in</h1>
+        <h1 className="m-0 font-display text-3xl font-semibold">Sign in</h1>
         <p className="m-0 mt-1 text-sm text-text-secondary">
-          {demoHint ?? 'Use the email and passphrase you chose when you set this site up.'}
+          {demoHint ?? 'Use the email and passphrase you signed up with.'}
         </p>
       </div>
 
@@ -282,17 +295,19 @@ export function LoginForm({ next, demoHint }: { next?: string; demoHint: string 
         {loading ? 'Signing in…' : 'Sign in'}
       </button>
 
-      <button
-        type="button"
-        onClick={() => void passkey()}
-        disabled={passkeyBusy}
-        className="rounded-full border border-border text-sm text-text-secondary hover:text-text-primary disabled:opacity-50"
-        style={{ minHeight: 44 }}
-      >
-        {passkeyBusy ? 'Waiting for your key…' : 'Sign in with a passkey'}
-      </button>
+      {showPasskey ? (
+        <button
+          type="button"
+          onClick={() => void passkey()}
+          disabled={passkeyBusy}
+          className="rounded-full border border-border text-sm text-text-secondary hover:text-text-primary disabled:opacity-50"
+          style={{ minHeight: 44 }}
+        >
+          {passkeyBusy ? 'Waiting for your key…' : 'Sign in with a passkey'}
+        </button>
+      ) : null}
 
-      {otpSent ? (
+      {!showEmailCode ? null : otpSent ? (
         <div className="grid gap-3">
           <label className="grid gap-1 text-sm">
             <span className="font-semibold">6-digit code</span>

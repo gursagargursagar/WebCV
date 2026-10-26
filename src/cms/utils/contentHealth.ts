@@ -284,9 +284,9 @@ export function analyseContent(
     title: 'Nothing tells you when an enquiry arrives',
     detail:
       'Messages reach your inbox here, but no email is sent, so you only see them by ' +
-      'signing in. Set OPB_SMTP_HOST and the related variables to change that.',
-    to: '/admin/messages',
-    action: 'See enquiries',
+      'signing in. Connect a mail server under Services to change that.',
+    to: '/admin/services',
+    action: 'Connect mail',
   }));
 
   check(failedNotifications === 0, () => ({

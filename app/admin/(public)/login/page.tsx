@@ -1,6 +1,9 @@
 import type { Metadata } from 'next';
 import { DEMO_EMAIL, DEMO_PASSPHRASE, isDemoMode } from '@/core/demo/config';
 import { LoginForm } from './login-form';
+import { isMultiSite } from '@/core/site/constants';
+import { currentSite } from '@/core/site/tenant';
+import { resolveTransport } from '@/core/email/transport';
 
 // Request-time by nature (Cache Components may block here). Reads the address (`?next=`) and the session per request.
 // (`instant = false` removed: WebCV runs without Cache Components.)
@@ -25,8 +28,16 @@ export default async function LoginPage({
 }) {
   const { next } = await searchParams;
 
+  // WebCV: passkeys need to know which portfolio this browser signs in to,
+  // and an emailed code needs a mail server. Offer neither when it would fail.
+  const multi = isMultiSite();
+  const showPasskey = !multi || Boolean(await currentSite());
+  const showEmailCode = !multi || resolveTransport().kind !== 'none';
+
   return (
     <LoginForm
+      showPasskey={showPasskey}
+      showEmailCode={showEmailCode}
       next={safeNext(next)}
       demoHint={isDemoMode() ? `Demo — sign in with ${DEMO_EMAIL} and ${DEMO_PASSPHRASE}.` : null}
     />

@@ -6,7 +6,10 @@ import { useState } from 'react';
 import { groupSections, type AdminSection } from './sections';
 
 /**
- * The admin's section nav — 25 links, and the phone is where it was worst.
+ * The admin's section nav — 25 links: a sidebar on a desktop, a Menu on a phone.
+ *
+ * (History.) As one wrapped header row it was the whole first screenful on a
+ * phone, and on a desktop a two-line wall above every screen.
  *
  * As a wrapped list the header was the whole first screenful on a 360px
  * viewport, and every link was a 20px-tall line of text: a scroll before you
@@ -56,19 +59,25 @@ export function AdminNav({ sections }: { sections: AdminSection[] }) {
     pathname === href || (href !== '/admin' && pathname.startsWith(`${href}/`));
   const current = sections.find((section) => isActive(section.href));
 
+  // One list, two layouts. Below `lg` it is a Menu button that opens the
+  // groups as full-width 44px rows; from `lg` up it is the sidebar, always
+  // open, with the section you are in marked by the SCAI cyan rule on its
+  // left edge (the swisscheeseai.au host-index treatment).
   return (
-    <nav aria-label="Admin sections" className="w-full sm:w-auto">
+    <nav aria-label="Admin sections" className="w-full">
       <button
         type="button"
         onClick={() => setOpen((value) => !value)}
         aria-expanded={open}
         aria-controls="admin-sections"
-        className="flex w-full items-center justify-between gap-3 rounded-full border border-border px-4 text-sm text-text-secondary hover:text-text-primary sm:hidden"
-        style={{ minHeight: 44 }}
+        className="flex w-full items-center justify-between gap-3 border border-border px-4 text-sm text-text-secondary hover:border-border-hover hover:text-text-primary lg:hidden"
+        style={{ minHeight: 44, borderRadius: 'var(--radius-md)' }}
       >
-        <span>
-          Menu
-          {current ? <span className="text-text-muted"> · {current.label}</span> : null}
+        <span className="flex items-baseline gap-2">
+          <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-text-muted">
+            Menu
+          </span>
+          {current ? <span className="font-semibold text-text-primary">{current.label}</span> : null}
         </span>
         <span aria-hidden className={`text-xs transition-transform ${open ? 'rotate-180' : ''}`}>
           ▾
@@ -76,17 +85,14 @@ export function AdminNav({ sections }: { sections: AdminSection[] }) {
       </button>
       <div
         id="admin-sections"
-        className={`${open ? 'flex' : 'hidden'} mt-3 flex-col gap-3 sm:mt-0 sm:flex sm:flex-row sm:flex-wrap sm:items-baseline sm:gap-x-6 sm:gap-y-2`}
+        className={`${open ? 'flex' : 'hidden'} mt-3 flex-col gap-5 lg:mt-0 lg:flex`}
       >
         {groupSections(sections).map(({ group, sections: members }) => (
-          <div
-            key={group ?? 'home'}
-            className="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:gap-2"
-          >
+          <div key={group ?? 'home'} className="flex flex-col gap-1">
             {group ? (
               <p
                 id={`admin-group-${group.replace(/\W+/g, '-').toLowerCase()}`}
-                className="m-0 font-mono text-xs uppercase tracking-widest text-text-muted"
+                className="m-0 px-3 pb-1 font-mono text-[11px] uppercase tracking-[0.14em] text-text-muted"
               >
                 {group}
               </p>
@@ -95,7 +101,7 @@ export function AdminNav({ sections }: { sections: AdminSection[] }) {
               aria-labelledby={
                 group ? `admin-group-${group.replace(/\W+/g, '-').toLowerCase()}` : undefined
               }
-              className="m-0 flex list-none flex-wrap gap-2 p-0 sm:gap-x-3 sm:gap-y-1"
+              className="m-0 grid list-none gap-px p-0"
             >
               {members.map((section) => {
                 const active = isActive(section.href);
@@ -105,11 +111,12 @@ export function AdminNav({ sections }: { sections: AdminSection[] }) {
                       href={section.href}
                       aria-current={active ? 'page' : undefined}
                       onClick={() => setOpen(false)}
-                      className={`flex min-h-[44px] items-center rounded-full border px-3 text-sm no-underline sm:min-h-[28px] sm:border-0 sm:px-0 ${
+                      className={`relative flex min-h-[44px] items-center px-3 text-sm no-underline transition-colors lg:min-h-[36px] ${
                         active
-                          ? 'border-text-primary font-semibold text-text-primary'
-                          : 'border-border text-text-secondary hover:text-text-primary'
+                          ? 'bg-surface-secondary font-semibold text-text-primary before:absolute before:inset-y-1.5 before:left-0 before:w-0.5 before:bg-accent'
+                          : 'text-text-secondary hover:bg-surface-secondary hover:text-text-primary'
                       }`}
+                      style={{ borderRadius: 'var(--radius-md)' }}
                     >
                       {section.label}
                       <PendingDot />

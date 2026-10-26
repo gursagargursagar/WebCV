@@ -10,15 +10,47 @@ export default async function SignupPage({
 }) {
   const { slug } = await searchParams;
   return (
-    <main className="wc-auth">
+    <main id="main" className="wc-container wc-auth">
+      <section className="wc-auth-aside" aria-label="What happens next">
+        <p className="wc-mono-label wc-auth-rule">
+          <span>WebCV / Sign up</span>
+          <span>01 / Create</span>
+        </p>
+        <h1>
+          Create your portfolio.
+          <span>About two minutes.</span>
+        </h1>
+        <ol className="wc-auth-steps">
+          <li>
+            <span>01</span>
+            <span>
+              <strong>Choose your address</strong>
+              webcv.au/your-name. This is the link you will share.
+            </span>
+          </li>
+          <li>
+            <span>02</span>
+            <span>
+              <strong>Edit in private</strong>
+              Your portfolio starts with sample content only you can see.
+            </span>
+          </li>
+          <li>
+            <span>03</span>
+            <span>
+              <strong>Publish when ready</strong>
+              One click puts your changes live.
+            </span>
+          </li>
+        </ol>
+      </section>
+
       <div className="wc-card">
-        <div>
-          <span className="wc-eyebrow">Step 1 of 2</span>
-          <h1 style={{ marginTop: 6 }}>Create your portfolio</h1>
-          <p className="sub">Next you will add your projects and photo in the editor.</p>
-        </div>
+        <p className="wc-mono-label">Step 1 of 2 · Account</p>
+        <h2 style={{ marginTop: 10 }}>Create your portfolio</h2>
+        <p className="wc-sub">Next, you will fill it in from the editor.</p>
         <SignupForm initialSlug={typeof slug === 'string' ? slug : ''} />
-        <p className="alt">
+        <p className="wc-alt">
           Already have a portfolio? <a href="/admin/login">Sign in</a>
         </p>
       </div>

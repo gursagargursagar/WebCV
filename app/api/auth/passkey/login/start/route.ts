@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import { assertSameOrigin } from '@/core/auth/guard';
 import { clientKey, rateLimit } from '@/core/auth/ratelimit';
 import { relyingParty, startPasskeyLogin } from '@/core/auth/passkey';
+import { isMultiSite } from '@/core/site/constants';
+import { currentSite } from '@/core/site/tenant';
 
 /**
  * Begins a passkey sign-in. Public — signing in cannot require being signed in.
@@ -20,6 +22,16 @@ export async function POST(req: Request) {
   // a bucket of its own: reloading the page must not use up the attempts a
   // deliberate "Sign in with a passkey" press needs.
   const body = (await req.json().catch(() => null)) as { autofill?: unknown } | null;
+
+  // WebCV: a passkey belongs to one portfolio, and with no `wc_site` cookie
+  // this browser has not said which. That is "no passkeys here", not a fault.
+  if (isMultiSite() && !(await currentSite())) {
+    return NextResponse.json(
+      { ok: false, error: 'Sign in with your email and passphrase first on this device.' },
+      { status: body?.autofill === true ? 200 : 400 }
+    );
+  }
+
   const bucket = body?.autofill === true ? 'passkey-autofill' : 'passkey-login';
   const limit = await rateLimit(
     `${bucket}:${await clientKey()}`,

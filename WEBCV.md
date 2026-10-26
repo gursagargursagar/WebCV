@@ -39,3 +39,20 @@ multi-user support added.
 | `OPB_SITE_URL` | `https://www.webcv.au` |
 
 The tables (`wc_*`) are created automatically on the first request.
+
+## Design: the Swiss Cheese AI skin
+
+WebCV uses the look of [swisscheeseai.au](https://www.swisscheeseai.au)
+(source: `gursagargursagar/scai-website`).
+
+| Element | Swiss Cheese AI style |
+| --- | --- |
+| Colours | Near-black `#050505` and paper `#f5f3f2`, with one cyan accent `#20c4dc` |
+| Type | Georgia headlines, Inter text, SF Mono labels |
+| Shapes | 4px corners and 1px rules |
+
+Where it applies:
+
+- **`src/styles/scai.css`** holds the design tokens. Anything wrapped in `.scai` uses them: the front page, sign-up, sign-in, the 404 page and the whole admin. The admin uses this skin whatever theme the owner chooses for their portfolio. Light and dark are both defined.
+- **`app/platform/platform.css`** lays out the front page in the swisscheeseai.au style: a white hero, ruled sections, a numbered flow and a closing band in the opposite colours to the page.
+- **The `swiss-cheese` theme in `core/theme/presets.ts`** is what every new portfolio starts with. Owners can change it in Appearance. The `<html data-preset>` attribute adds square controls and tight headlines, for this theme only.

@@ -1,5 +1,4 @@
 import { siteNow } from '@/core/content/now';
-import { atLeastOne, SHELL_SLUG } from '@/core/pages/static-params';
 import { isPageLive } from '@/core/pages/schema';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
@@ -7,7 +6,7 @@ import { buildMetadata } from '@/core/content/metadata';
 import { BlockList } from '@/core/blocks/registry';
 import { blockContentFrom } from '@/core/blocks/content';
 import { getContentForChannel } from '@/core/content/read';
-import { currentChannel, getRoutablePages, resolvePage } from '@/core/pages/read';
+import { currentChannel, resolvePage } from '@/core/pages/read';
 import { segmentsToSlug } from '@/core/pages/schema';
 import { PreviewBanner } from '../preview-banner';
 
