@@ -97,7 +97,7 @@ export function SignupForm({ initialSlug }: { initialSlug: string }) {
         setBusy(false);
         return;
       }
-      window.location.assign('/admin');
+      window.location.assign('/admin/studio');
     } catch {
       setFormError('Could not reach WebCV. Check your connection and try again.');
       setBusy(false);

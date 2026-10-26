@@ -21,6 +21,11 @@ import { groupSections, type AdminSection } from './sections';
  * System), each its own list under a small heading, so the eye finds the
  * cluster first and the link second.
  *
+ * In WebCV the site is built in the Studio, so only the everyday sections
+ * show; the rest sit behind an Advanced toggle (`withAdvanced`). It opens by
+ * itself when you are on one of those screens, so the nav never hides where
+ * you are.
+ *
  * Two details worth keeping:
  * - `aria-current="page"` marks the section you are in, for eyes and for
  *   screen readers. `/admin` only counts as active on itself; matching it as a
@@ -58,6 +63,53 @@ export function AdminNav({ sections }: { sections: AdminSection[] }) {
   const isActive = (href: string) =>
     pathname === href || (href !== '/admin' && pathname.startsWith(`${href}/`));
   const current = sections.find((section) => isActive(section.href));
+  const everyday = sections.filter((section) => !section.advanced);
+  const advanced = sections.filter((section) => section.advanced);
+  // Open by itself on an advanced screen, until someone chooses otherwise.
+  const [toggled, setToggled] = useState<boolean | null>(null);
+  const showAdvanced = toggled ?? Boolean(current?.advanced);
+
+  const groups = (list: AdminSection[]) =>
+    groupSections(list).map(({ group, sections: members }) => (
+      <div key={group ?? 'home'} className="flex flex-col gap-1">
+        {group ? (
+          <p
+            id={`admin-group-${group.replace(/\W+/g, '-').toLowerCase()}`}
+            className="m-0 px-3 pb-1 font-mono text-[11px] uppercase tracking-[0.14em] text-text-muted"
+          >
+            {group}
+          </p>
+        ) : null}
+        <ul
+          aria-labelledby={
+            group ? `admin-group-${group.replace(/\W+/g, '-').toLowerCase()}` : undefined
+          }
+          className="m-0 grid list-none gap-px p-0"
+        >
+          {members.map((section) => {
+            const active = isActive(section.href);
+            return (
+              <li key={section.href}>
+                <Link
+                  href={section.href}
+                  aria-current={active ? 'page' : undefined}
+                  onClick={() => setOpen(false)}
+                  className={`relative flex min-h-[44px] items-center px-3 text-sm no-underline transition-colors lg:min-h-[36px] ${
+                    active
+                      ? 'bg-surface-secondary font-semibold text-text-primary before:absolute before:inset-y-1.5 before:left-0 before:w-0.5 before:bg-accent'
+                      : 'text-text-secondary hover:bg-surface-secondary hover:text-text-primary'
+                  }`}
+                  style={{ borderRadius: 'var(--radius-md)' }}
+                >
+                  {section.label}
+                  <PendingDot />
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+    ));
 
   // One list, two layouts. Below `lg` it is a Menu button that opens the
   // groups as full-width 44px rows; from `lg` up it is the sidebar, always
@@ -77,7 +129,9 @@ export function AdminNav({ sections }: { sections: AdminSection[] }) {
           <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-text-muted">
             Menu
           </span>
-          {current ? <span className="font-semibold text-text-primary">{current.label}</span> : null}
+          {current ? (
+            <span className="font-semibold text-text-primary">{current.label}</span>
+          ) : null}
         </span>
         <span aria-hidden className={`text-xs transition-transform ${open ? 'rotate-180' : ''}`}>
           ▾
@@ -87,46 +141,40 @@ export function AdminNav({ sections }: { sections: AdminSection[] }) {
         id="admin-sections"
         className={`${open ? 'flex' : 'hidden'} mt-3 flex-col gap-5 lg:mt-0 lg:flex`}
       >
-        {groupSections(sections).map(({ group, sections: members }) => (
-          <div key={group ?? 'home'} className="flex flex-col gap-1">
-            {group ? (
-              <p
-                id={`admin-group-${group.replace(/\W+/g, '-').toLowerCase()}`}
-                className="m-0 px-3 pb-1 font-mono text-[11px] uppercase tracking-[0.14em] text-text-muted"
+        {advanced.length === 0 ? (
+          groups(sections)
+        ) : (
+          <>
+            {/* Everyday sections as one plain list: a group label over two links is noise. */}
+            {groups(everyday.map(({ group: _group, ...section }) => section))}
+            <div className="flex flex-col gap-1 border-t border-border pt-4">
+              <button
+                type="button"
+                onClick={() => setToggled(!showAdvanced)}
+                aria-expanded={showAdvanced}
+                aria-controls="admin-advanced"
+                className="flex w-full items-center justify-between gap-3 px-3 text-sm text-text-secondary hover:bg-surface-secondary hover:text-text-primary"
+                style={{ minHeight: 44, borderRadius: 'var(--radius-md)' }}
               >
-                {group}
-              </p>
-            ) : null}
-            <ul
-              aria-labelledby={
-                group ? `admin-group-${group.replace(/\W+/g, '-').toLowerCase()}` : undefined
-              }
-              className="m-0 grid list-none gap-px p-0"
-            >
-              {members.map((section) => {
-                const active = isActive(section.href);
-                return (
-                  <li key={section.href}>
-                    <Link
-                      href={section.href}
-                      aria-current={active ? 'page' : undefined}
-                      onClick={() => setOpen(false)}
-                      className={`relative flex min-h-[44px] items-center px-3 text-sm no-underline transition-colors lg:min-h-[36px] ${
-                        active
-                          ? 'bg-surface-secondary font-semibold text-text-primary before:absolute before:inset-y-1.5 before:left-0 before:w-0.5 before:bg-accent'
-                          : 'text-text-secondary hover:bg-surface-secondary hover:text-text-primary'
-                      }`}
-                      style={{ borderRadius: 'var(--radius-md)' }}
-                    >
-                      {section.label}
-                      <PendingDot />
-                    </Link>
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
-        ))}
+                <span>
+                  Advanced <span className="text-text-muted">· {advanced.length} more</span>
+                </span>
+                <span
+                  aria-hidden
+                  className={`text-xs transition-transform ${showAdvanced ? 'rotate-180' : ''}`}
+                >
+                  ▾
+                </span>
+              </button>
+              <div
+                id="admin-advanced"
+                className={`${showAdvanced ? 'flex' : 'hidden'} mt-2 flex-col gap-5`}
+              >
+                {groups(advanced)}
+              </div>
+            </div>
+          </>
+        )}
       </div>
     </nav>
   );

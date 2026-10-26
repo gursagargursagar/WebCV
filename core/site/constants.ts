@@ -58,6 +58,9 @@ export const RESERVED_SLUGS = new Set([
   'www',
   'webcv',
   'gursagar24',
+  // The Studio's editor and the route its published pages render through.
+  'studio',
+  'wcs-render',
   // Folders in `public/`, served as files at the top level.
   'demo',
   'llms.txt',

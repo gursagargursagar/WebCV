@@ -7,7 +7,13 @@
  */
 export type AdminGroup = 'Build' | 'Profile' | 'Audience' | 'Look & reach' | 'System';
 
-export type AdminSection = { href: string; label: string; group?: AdminGroup };
+export type AdminSection = {
+  href: string;
+  label: string;
+  group?: AdminGroup;
+  /** Shown behind the nav's Advanced toggle instead of in the main list. */
+  advanced?: boolean;
+};
 
 /**
  * Twenty-five links in one wrapped row asked a person to scan all of them to
@@ -52,6 +58,27 @@ export function withLegacyCaseStudies(hasLegacy: boolean): AdminSection[] {
   return hasLegacy
     ? ADMIN_SECTIONS
     : ADMIN_SECTIONS.filter((section) => section.href !== '/admin/case-studies');
+}
+
+/**
+ * WebCV: what an owner needs beside the Studio. The site itself is built in
+ * the Studio, so the classic editors — every one of them still here and still
+ * working — wait under Advanced rather than greeting someone who came to
+ * change a photo with twenty-five choices.
+ */
+const EVERYDAY = new Set([
+  '/admin',
+  '/admin/messages',
+  '/admin/analytics',
+  '/admin/media',
+  '/admin/settings',
+  '/admin/your-site',
+]);
+
+export function withAdvanced(sections: AdminSection[]): AdminSection[] {
+  return sections.map((section) =>
+    EVERYDAY.has(section.href) ? section : { ...section, advanced: true }
+  );
 }
 
 /** Consecutive runs of one group, in order. Dashboard stands alone. */

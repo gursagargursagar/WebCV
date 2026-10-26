@@ -9,6 +9,8 @@ import { resolveTransportWithStored } from '@/core/email/transport';
 import type { CMSState } from '@/cms/types/cms';
 import { PublishButton } from './publish-button';
 import { launchSteps } from '@/core/content/launch';
+import { isMultiSite } from '@/core/site/constants';
+import { StudioCard } from './_components/studio-card';
 
 export const metadata: Metadata = {
   title: 'Dashboard',
@@ -70,30 +72,11 @@ export default async function DashboardPage() {
     emailConfigured: transport.kind !== 'none',
   });
   const stepsDone = steps.filter((step) => step.done).length;
+  const multi = isMultiSite();
+  const unread = inbox.filter((m) => m.status === 'unread').length;
 
-  return (
-    <div className="grid gap-6">
-      <div className="flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <p className="m-0 font-mono text-xs uppercase tracking-widest text-text-muted">
-            Overview
-          </p>
-          <h1 className="font-display m-0 mt-1 text-3xl">
-            Welcome back, {baseline.settings?.fullName || 'there'}
-          </h1>
-          <p className="m-0 mt-1 text-text-secondary">
-            What is wrong with the site right now, and what to do about it.
-          </p>
-        </div>
-        <Link
-          href="/admin/pages"
-          className="rounded-full bg-text-primary px-5 font-semibold text-bg no-underline"
-          style={{ minHeight: 44, display: 'inline-flex', alignItems: 'center' }}
-        >
-          Pages
-        </Link>
-      </div>
-
+  const classic = (
+    <>
       {stepsDone < steps.length ? (
         <section
           aria-labelledby="launch-heading"
@@ -308,6 +291,73 @@ export default async function DashboardPage() {
           </p>
         </section>
       </div>
+    </>
+  );
+
+  return (
+    <div className="grid gap-6">
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <p className="m-0 font-mono text-xs uppercase tracking-widest text-text-muted">
+            Overview
+          </p>
+          <h1 className="font-display m-0 mt-1 text-3xl">
+            Welcome back, {baseline.settings?.fullName || 'there'}
+          </h1>
+          <p className="m-0 mt-1 text-text-secondary">
+            {multi
+              ? 'Your site is edited in the Studio. Everything else is here.'
+              : 'What is wrong with the site right now, and what to do about it.'}
+          </p>
+        </div>
+        <Link
+          href={multi ? '/admin/studio' : '/admin/pages'}
+          className="rounded-full bg-text-primary px-5 font-semibold text-bg no-underline"
+          style={{ minHeight: 44, display: 'inline-flex', alignItems: 'center' }}
+        >
+          {multi ? 'Open Studio' : 'Pages'}
+        </Link>
+      </div>
+
+      {multi ? <StudioCard /> : null}
+      {multi ? (
+        <section className="grid gap-3 rounded-2xl border border-border p-4" aria-label="Messages">
+          <h2 className="m-0 text-xl">Messages</h2>
+          <p className="m-0 text-sm text-text-secondary">
+            {unread === 0
+              ? 'No unread messages. People reach you through the Contact block on your site.'
+              : `${unread} unread message${unread === 1 ? '' : 's'} from your contact form.`}
+          </p>
+          <Link
+            href="/admin/messages"
+            className="text-sm"
+            style={{ minHeight: 44, display: 'inline-flex', alignItems: 'center' }}
+          >
+            Open messages →
+          </Link>
+        </section>
+      ) : null}
+      {multi ? (
+        <details className="group rounded-2xl border border-border">
+          <summary
+            className="flex cursor-pointer list-none items-center justify-between gap-3 px-4 text-sm font-semibold"
+            style={{ minHeight: 52 }}
+          >
+            <span>
+              Advanced{' '}
+              <span className="font-normal text-text-secondary">
+                · checks for the classic site editor
+              </span>
+            </span>
+            <span aria-hidden="true" className="text-xs transition-transform group-open:rotate-180">
+              ▾
+            </span>
+          </summary>
+          <div className="grid gap-6 border-t border-border p-4">{classic}</div>
+        </details>
+      ) : (
+        classic
+      )}
     </div>
   );
 }

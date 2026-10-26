@@ -56,3 +56,27 @@ Where it applies:
 - **`src/styles/scai.css`** holds the design tokens. Anything wrapped in `.scai` uses them: the front page, sign-up, sign-in, the 404 page and the whole admin. The admin uses this skin whatever theme the owner chooses for their portfolio. Light and dark are both defined.
 - **`app/platform/platform.css`** lays out the front page in the swisscheeseai.au style: a white hero, ruled sections, a numbered flow and a closing band in the opposite colours to the page.
 - **The `swiss-cheese` theme in `core/theme/presets.ts`** is what every new portfolio starts with. Owners can change it in Appearance. The `<html data-preset>` attribute adds square controls and tight headlines, for this theme only.
+
+## The Studio
+
+`/admin/studio` is where a WebCV portfolio is built, in the manner of Adobe
+Portfolio: pick one of six ready-made templates, then edit the page where it
+stands. The preview is always on screen; words are typed straight onto it,
+pictures are replaced from a button over them, and a block's other settings
+open beside it. The editor is [Puck](https://github.com/puckeditor/puck) (MIT)
+in a custom layout.
+
+- `core/studio/` — the site document (`types.ts`), templates and fonts
+  (`design.ts`), starter sites (`starters.ts`), the blocks (`blocks.tsx`, plain
+  functions shared by the editor and the published site), the template styles
+  (`site.css`, everything under `.wcs`), storage (`store.ts`: `studio/draft`
+  and `studio/published` records) and the proxy's route lookup (`routes.ts`).
+- `app/admin/(studio)/studio/` — the editor (client only) and its draft preview.
+- `app/api/admin/studio/` — autosave (revisioned) and publish; both call
+  `requireOwner()`.
+- `app/wcs-render/` — a published Studio page. The proxy rewrites
+  `/<site>/<page>` here when the site has a published Studio page at that
+  address, and to the classic routes otherwise, so nothing classic is lost.
+
+The classic editors are all still there, under **Advanced** in the admin's menu
+and on the dashboard.

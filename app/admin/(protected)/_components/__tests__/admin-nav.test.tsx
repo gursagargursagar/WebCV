@@ -5,7 +5,7 @@ import path from 'node:path';
 import { renderToStaticMarkup } from 'react-dom/server';
 import axe from 'axe-core';
 import { AdminNav } from '../admin-nav';
-import { ADMIN_SECTIONS } from '../sections';
+import { ADMIN_SECTIONS, withAdvanced } from '../sections';
 
 /**
  * The admin's section nav, checked where it can be checked without a browser.
@@ -93,5 +93,31 @@ describe('the admin section nav', () => {
       .filter(Boolean)
       .map((id) => document.getElementById(id!)?.textContent);
     expect(names).toEqual(['Build', 'Profile', 'Audience', 'Look & reach', 'System']);
+  });
+
+  it('in WebCV, keeps the classic editors behind an Advanced toggle without dropping any', () => {
+    currentPath.value = '/admin';
+    document.body.innerHTML = `<header>${renderToStaticMarkup(
+      <AdminNav sections={withAdvanced(ADMIN_SECTIONS)} />
+    )}</header>`;
+    const toggle = document.querySelector('[aria-controls="admin-advanced"]');
+    expect(toggle?.getAttribute('aria-expanded')).toBe('false');
+    const advanced = document.getElementById('admin-advanced');
+    expect(advanced?.className).toContain('hidden');
+    expect([...advanced!.querySelectorAll('a')].map((a) => a.getAttribute('href'))).toContain(
+      '/admin/pages'
+    );
+    // Hidden, not deleted: every section is still linked somewhere in the nav.
+    expect(document.querySelectorAll('nav a').length).toBe(ADMIN_SECTIONS.length);
+  });
+
+  it('opens Advanced by itself when you are on one of its screens', () => {
+    currentPath.value = '/admin/seo';
+    document.body.innerHTML = `<header>${renderToStaticMarkup(
+      <AdminNav sections={withAdvanced(ADMIN_SECTIONS)} />
+    )}</header>`;
+    const toggle = document.querySelector('[aria-controls="admin-advanced"]');
+    expect(toggle?.getAttribute('aria-expanded')).toBe('true');
+    expect(document.getElementById('admin-advanced')?.className).not.toContain('hidden');
   });
 });

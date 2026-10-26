@@ -6,7 +6,7 @@ import { isWelcomePlaceholder } from '@/core/content/welcome';
 import { AdminNav } from './_components/admin-nav';
 import { OfflineNotice } from './_components/offline-notice';
 import { CommandPalette, type PaletteRecord } from './_components/command-palette';
-import { withLegacyCaseStudies } from './_components/sections';
+import { withAdvanced, withLegacyCaseStudies } from './_components/sections';
 import { ErrorCollector } from './error-collector';
 import { WelcomeGate } from './welcome-gate';
 import { AssistProvider } from './_components/assist';
@@ -80,9 +80,11 @@ export default async function ProtectedAdminLayout({ children }: { children: Rea
   // WebCV hides the screens about running the platform itself (which database,
   // the upstream project's GitHub support): an owner can do nothing there.
   const PLATFORM_ONLY = new Set(['/admin/storage', '/admin/help']);
-  const sections = withLegacyCaseStudies((draft.caseStudies ?? []).length > 0).filter(
+  const listed = withLegacyCaseStudies((draft.caseStudies ?? []).length > 0).filter(
     (section) => !(isMultiSite() && PLATFORM_ONLY.has(section.href))
   );
+  // WebCV builds the site in the Studio; the classic editors move under Advanced.
+  const sections = isMultiSite() ? withAdvanced(listed) : listed;
 
   // What the command palette can jump to besides the sections: the owner's own
   // pages, writing and work, each opening its editor on that record.
@@ -108,7 +110,10 @@ export default async function ProtectedAdminLayout({ children }: { children: Rea
     // `.scai` puts the admin on WebCV's own skin (src/styles/scai.css), so it
     // looks the same whatever theme the owner gives their portfolio.
     <div className="scai min-h-screen bg-bg font-body text-text-primary">
-      <WelcomeGate looksUnconfigured={isWelcomePlaceholder(draft.settings?.fullName)} />
+      {/* WebCV's first run is the Studio's template picker, not the classic wizard. */}
+      <WelcomeGate
+        looksUnconfigured={!isMultiSite() && isWelcomePlaceholder(draft.settings?.fullName)}
+      />
       <ErrorCollector />
       <a
         href="#admin-main"
@@ -127,7 +132,14 @@ export default async function ProtectedAdminLayout({ children }: { children: Rea
           </div>
           <div className="ml-auto flex items-center gap-2">
             <OfflineNotice />
-            <PublishStatus unpublished={unpublished} expectedRevision={publishedMeta?.revision ?? 0} />
+            {/* WebCV publishes from the Studio; the classic site's publish
+                lives with its checks under the dashboard's Advanced section. */}
+            {isMultiSite() ? null : (
+              <PublishStatus
+                unpublished={unpublished}
+                expectedRevision={publishedMeta?.revision ?? 0}
+              />
+            )}
             {site ? <SiteLink site={site} /> : null}
             <ThemeToggle />
             <span className="hidden md:inline-flex">
@@ -138,6 +150,16 @@ export default async function ProtectedAdminLayout({ children }: { children: Rea
       </header>
       <div className="mx-auto max-w-[1440px] lg:flex">
         <aside className="border-b border-border px-4 py-3 sm:px-6 lg:sticky lg:top-[65px] lg:h-[calc(100vh-65px)] lg:w-60 lg:shrink-0 lg:overflow-y-auto lg:border-b-0 lg:border-r lg:px-3 lg:py-6">
+          {isMultiSite() ? (
+            <a
+              href="/admin/studio"
+              className="mb-3 flex items-center justify-between gap-3 rounded-full bg-text-primary px-5 text-sm font-semibold text-bg no-underline lg:mb-5"
+              style={{ minHeight: 44 }}
+            >
+              Edit your site
+              <span aria-hidden="true">→</span>
+            </a>
+          ) : null}
           <div className="flex items-start gap-2">
             <div className="min-w-0 flex-1">
               <AdminNav sections={sections} />

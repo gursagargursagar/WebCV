@@ -1,0 +1,1237 @@
+/*
+ * Studio sites: one stylesheet for every template.
+ *
+ * Everything is scoped under `.wcs`, so a published page, the editor's preview
+ * frame and the template thumbnails can all load it next to other styles
+ * without either side leaking. A template is a class (`t-<id>`) that sets the
+ * variables below and rearranges a few regions; mode (`m-light`/`m-dark`) sets
+ * the palette; the owner's accent and fonts arrive as inline variables.
+ *
+ * Blocks space themselves with padding, never margin: in the editor each one
+ * sits in a wrapper of Puck's, and margins collapse differently through it
+ * than on the published page. Padding looks the same in both.
+ */
+
+.wcs {
+  --bg: #ffffff;
+  --fg: #141414;
+  --muted: #666666;
+  --line: #e4e4e4;
+  --surface: #f3f3f3;
+  --max: 1200px;
+  --measure: 680px;
+  --pad: clamp(20px, 4vw, 48px);
+  --radius: 4px;
+  --btn-radius: 999px;
+  --grid-cols: 3;
+  --grid-shape: 4 / 3;
+  --grid-gap: 40px 28px;
+  --head-weight: 600;
+  --head-track: -0.02em;
+  --mono: var(--font-geist-mono), ui-monospace, 'SFMono-Regular', Menlo, monospace;
+
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  overflow-x: clip;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--f-body), ui-sans-serif, system-ui, sans-serif;
+  font-size: 17px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+.wcs.m-dark {
+  --bg: #0f0f10;
+  --fg: #f2f1ef;
+  --muted: #9d9ba0;
+  --line: #2a2a2d;
+  --surface: #1a1a1c;
+  color-scheme: dark;
+}
+
+.wcs *,
+.wcs *::before,
+.wcs *::after {
+  box-sizing: border-box;
+}
+
+.wcs ::selection {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+.wcs a {
+  color: inherit;
+}
+
+.wcs a:focus-visible,
+.wcs button:focus-visible,
+.wcs input:focus-visible,
+.wcs textarea:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.wcs h1,
+.wcs h2,
+.wcs h3 {
+  margin: 0;
+  font-family: var(--f-head), ui-sans-serif, system-ui, sans-serif;
+  font-weight: var(--head-weight);
+  letter-spacing: var(--head-track);
+  line-height: 1.08;
+}
+
+/* Zero specificity, so a block's own margins (an image centred at "narrow")
+   are never outranked by this reset. */
+:where(.wcs) :where(p, figure, blockquote) {
+  margin: 0;
+}
+
+/* The page this renders inside may colour headings and text itself (the admin
+   and the classic site both do); a Studio site answers only to its own palette. */
+.wcs h1,
+.wcs h2,
+.wcs h3,
+.wcs p,
+.wcs li,
+.wcs blockquote,
+.wcs figcaption,
+.wcs label {
+  color: inherit;
+}
+
+.wcs-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ---------------------------------------------------------------- header */
+
+.wcs-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 32px;
+  width: 100%;
+  max-width: var(--max);
+  margin: 0 auto;
+  padding: 28px var(--pad);
+}
+
+.wcs-brand {
+  display: inline-block;
+  font-family: var(--f-head), ui-sans-serif, system-ui, sans-serif;
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+  text-decoration: none;
+}
+
+.wcs-tagline {
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.wcs-nav ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 24px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.wcs-nav a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--muted);
+  font-size: 15px;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.wcs-nav a:hover,
+.wcs-nav a[aria-current='page'] {
+  color: var(--fg);
+}
+
+.wcs-nav a[aria-current='page'] {
+  text-decoration: underline;
+  text-decoration-color: var(--accent);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 8px;
+}
+
+/* ------------------------------------------------------------------ main */
+
+.wcs-main {
+  flex: 1;
+  width: 100%;
+  max-width: var(--max);
+  margin: 0 auto;
+  padding: 8px var(--pad) 72px;
+}
+
+.wcs-block {
+  width: 100%;
+  padding-block: 20px;
+}
+
+.wcs-text,
+.wcs-heading,
+.wcs-quote,
+.wcs-contact,
+.wcs-button,
+.wcs-social,
+.wcs-project-head {
+  max-width: var(--measure);
+  margin-inline: auto;
+}
+
+.a-center {
+  text-align: center;
+}
+
+.wcs-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+  padding: 24px;
+  border: 1.5px dashed var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--muted);
+  font-size: 14px;
+  text-align: center;
+}
+
+/* Intro */
+.wcs-hero {
+  padding-block: 56px 40px;
+}
+
+.wcs-hero-title {
+  max-width: 18ch;
+  font-size: clamp(38px, 6.2vw, 76px);
+  line-height: 1.02;
+  white-space: pre-line;
+}
+
+.wcs-hero.s-m .wcs-hero-title {
+  font-size: clamp(32px, 4.8vw, 56px);
+}
+
+.wcs-hero.s-s .wcs-hero-title {
+  font-size: clamp(26px, 3.4vw, 40px);
+}
+
+.wcs-hero-text {
+  max-width: 44ch;
+  margin-top: 20px;
+  color: var(--muted);
+  font-size: clamp(18px, 1.8vw, 22px);
+  line-height: 1.5;
+  white-space: pre-line;
+}
+
+.wcs-hero.a-center .wcs-hero-title,
+.wcs-hero.a-center .wcs-hero-text {
+  margin-inline: auto;
+}
+
+/* Heading and text */
+.wcs-heading h2 {
+  font-size: clamp(26px, 3vw, 36px);
+}
+
+.wcs-heading.s-s h2 {
+  font-size: 21px;
+}
+
+.wcs-heading.s-l h2 {
+  font-size: clamp(34px, 4.6vw, 54px);
+}
+
+.wcs-text p {
+  white-space: pre-line;
+}
+
+.wcs-text.s-lead p {
+  font-size: clamp(20px, 2.1vw, 25px);
+  line-height: 1.5;
+}
+
+/* Media */
+.wcs-media {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.wcs-media img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.wcs-caption {
+  margin-top: 12px;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.wcs-image.w-narrow {
+  max-width: var(--measure);
+  margin-inline: auto;
+}
+
+.wcs-image.w-normal {
+  max-width: 920px;
+  margin-inline: auto;
+}
+
+.wcs-image.w-full {
+  width: 100vw;
+  max-width: none;
+  margin-left: calc(50% - 50vw);
+}
+
+.wcs-image.w-full .wcs-media {
+  border-radius: 0;
+}
+
+.wcs-image.w-full .wcs-caption {
+  padding-inline: var(--pad);
+}
+
+.wcs-photos {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.wcs-photos.c-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.wcs-photos.c-4 {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.wcs-photos.g-none {
+  gap: 0;
+}
+
+.wcs-photos.g-large {
+  gap: 28px;
+}
+
+.wcs-photos .wcs-media {
+  aspect-ratio: 1;
+}
+
+.wcs-photos img {
+  height: 100%;
+  object-fit: cover;
+}
+
+.wcs-photos .wcs-placeholder {
+  height: 100%;
+  min-height: 0;
+}
+
+.wcs-split {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: center;
+  gap: clamp(24px, 5vw, 64px);
+}
+
+.wcs-split.side-right .wcs-media {
+  order: 2;
+}
+
+.wcs-split h2 {
+  font-size: clamp(26px, 3vw, 38px);
+}
+
+.wcs-split p {
+  margin-top: 16px;
+  color: var(--muted);
+  white-space: pre-line;
+}
+
+.ratio-16x9 {
+  aspect-ratio: 16 / 9;
+}
+
+.ratio-16x9 iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+/* Button */
+.wcs-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 0 26px;
+  border: 1.5px solid transparent;
+  border-radius: var(--btn-radius);
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    transform 0.2s,
+    opacity 0.2s;
+}
+
+.wcs-btn.solid {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+.wcs-btn.outline {
+  border-color: currentColor;
+}
+
+.wcs-btn:hover {
+  opacity: 0.88;
+}
+
+.wcs-btn:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
+/* Quote */
+.wcs-quote blockquote {
+  font-family: var(--f-head), ui-sans-serif, system-ui, sans-serif;
+  font-size: clamp(22px, 2.6vw, 32px);
+  font-weight: var(--head-weight);
+  letter-spacing: var(--head-track);
+  line-height: 1.3;
+  white-space: pre-line;
+}
+
+.wcs-quote blockquote::before {
+  content: '“';
+  display: block;
+  height: 0.6em;
+  color: var(--accent);
+  font-size: 2.4em;
+  line-height: 1;
+}
+
+.wcs-quote figcaption {
+  margin-top: 16px;
+  color: var(--muted);
+  font-size: 15px;
+}
+
+/* Project grid */
+.wcs-projects {
+  --cols: var(--grid-cols);
+  --shape: var(--grid-shape);
+  padding-block: 24px;
+}
+
+.wcs-projects.cols-1 {
+  --cols: 1;
+}
+.wcs-projects.cols-2 {
+  --cols: 2;
+}
+.wcs-projects.cols-3 {
+  --cols: 3;
+}
+.wcs-projects.cols-4 {
+  --cols: 4;
+}
+.wcs-projects.shape-landscape {
+  --shape: 4 / 3;
+}
+.wcs-projects.shape-square {
+  --shape: 1 / 1;
+}
+.wcs-projects.shape-portrait {
+  --shape: 4 / 5;
+}
+
+.wcs-projects-title {
+  margin-bottom: 28px;
+  font-size: clamp(24px, 2.6vw, 32px);
+}
+
+.wcs-grid {
+  display: grid;
+  grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
+  gap: var(--grid-gap);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.wcs-card {
+  position: relative;
+}
+
+.wcs-card-link {
+  display: block;
+  position: relative;
+  color: inherit;
+  text-decoration: none;
+}
+
+.wcs-card-cover {
+  display: block;
+  overflow: hidden;
+  aspect-ratio: var(--shape);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.wcs-card-cover img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.wcs-card-link:hover .wcs-card-cover img {
+  transform: scale(1.035);
+}
+
+.wcs-card-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 16px;
+  color: var(--muted);
+  font-size: 14px;
+  text-align: center;
+}
+
+.wcs-card-text {
+  display: block;
+  margin-top: 14px;
+}
+
+.wcs-card-title {
+  display: block;
+  font-family: var(--f-head), ui-sans-serif, system-ui, sans-serif;
+  font-size: 17px;
+  font-weight: var(--head-weight);
+  line-height: 1.3;
+}
+
+.wcs-card-sub {
+  display: block;
+  margin-top: 2px;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+/* Titles over the cover, shown on hover — or always, on a touch screen. */
+.wcs-projects.cap-hover .wcs-card-text,
+.t-gallery .wcs-projects.cap-auto .wcs-card-text,
+.t-grid .wcs-projects.cap-auto .wcs-card-text {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  margin: 0;
+  padding: 20px;
+  border-radius: var(--radius);
+  background: linear-gradient(180deg, transparent 35%, rgb(0 0 0 / 0.72));
+  color: #ffffff;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.wcs-projects.cap-hover .wcs-card-sub,
+.t-gallery .wcs-projects.cap-auto .wcs-card-sub,
+.t-grid .wcs-projects.cap-auto .wcs-card-sub {
+  color: rgb(255 255 255 / 0.8);
+}
+
+.wcs-projects.cap-hover .wcs-card-link:is(:hover, :focus-visible) .wcs-card-text,
+.t-gallery .wcs-projects.cap-auto .wcs-card-link:is(:hover, :focus-visible) .wcs-card-text,
+.t-grid .wcs-projects.cap-auto .wcs-card-link:is(:hover, :focus-visible) .wcs-card-text {
+  opacity: 1;
+}
+
+@media (hover: none) {
+  .wcs-projects.cap-hover .wcs-card-text,
+  .t-gallery .wcs-projects.cap-auto .wcs-card-text,
+  .t-grid .wcs-projects.cap-auto .wcs-card-text {
+    opacity: 1;
+  }
+}
+
+.wcs-projects.cap-none .wcs-card-text {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+
+/* Contact */
+.wcs-contact {
+  text-align: center;
+}
+
+.wcs-contact h2 {
+  font-size: clamp(28px, 4vw, 46px);
+}
+
+.wcs-contact > p {
+  margin-top: 14px;
+  color: var(--muted);
+  white-space: pre-line;
+}
+
+.wcs-contact-mail a {
+  font-size: 20px;
+  text-decoration-color: var(--accent);
+  text-underline-offset: 6px;
+}
+
+.wcs-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 32px;
+  text-align: left;
+}
+
+.wcs-form label {
+  display: grid;
+  gap: 6px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.wcs-form-wide,
+.wcs-form .wcs-btn,
+.wcs-form-error {
+  grid-column: 1 / -1;
+}
+
+.wcs-form .wcs-btn {
+  justify-self: start;
+}
+
+.wcs-form input,
+.wcs-form textarea {
+  width: 100%;
+  min-height: 48px;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: max(var(--radius), 6px);
+  background: var(--bg);
+  color: var(--fg);
+  font: inherit;
+  font-size: 16px;
+}
+
+.wcs-form-error {
+  color: #d93a2b;
+  font-size: 14px;
+}
+
+.wcs-form-done {
+  margin-top: 24px;
+  font-size: 18px;
+}
+
+.wcs-trap {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+/* Social, space, divider */
+.wcs-social {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 28px;
+  margin-block: 0;
+  padding-inline: 0;
+  list-style: none;
+}
+
+.wcs-social.a-center {
+  justify-content: center;
+}
+
+.wcs-social a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  text-decoration: underline;
+  text-decoration-color: var(--line);
+  text-underline-offset: 6px;
+  transition: text-decoration-color 0.2s;
+}
+
+.wcs-social a:hover {
+  text-decoration-color: var(--accent);
+}
+
+.wcs-spacer.s-s {
+  height: 16px;
+}
+.wcs-spacer.s-m {
+  height: 48px;
+}
+.wcs-spacer.s-l {
+  height: 96px;
+}
+.wcs-spacer.s-xl {
+  height: 160px;
+}
+
+.wcs-divider {
+  height: 0;
+  margin: 24px 0;
+  padding: 0;
+  border: 0;
+  border-top: 1px solid var(--line);
+}
+
+.wcs-divider.short {
+  width: 72px;
+  margin-inline: auto;
+  border-top: 2px solid var(--accent);
+}
+
+/* Project pages */
+.wcs-project-head {
+  padding-block: 40px 28px;
+  text-align: center;
+}
+
+.wcs-project-title {
+  font-size: clamp(34px, 5vw, 60px);
+}
+
+.wcs-project-sub {
+  margin-top: 14px;
+  color: var(--muted);
+  font-size: clamp(17px, 1.7vw, 20px);
+}
+
+.wcs-project-year {
+  margin-top: 8px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+/* ---------------------------------------------------------------- footer */
+
+.wcs-footer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 12px 24px;
+  width: 100%;
+  max-width: var(--max);
+  margin: 0 auto;
+  padding: 28px var(--pad) 36px;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.wcs-made {
+  text-decoration: none;
+}
+
+.wcs-made:hover {
+  text-decoration: underline;
+}
+
+/* ------------------------------------------------------------- templates */
+
+/* Atelier: centred header, titles under the covers. */
+.t-atelier .wcs-header {
+  flex-direction: column;
+  justify-content: center;
+  padding-block: 52px 28px;
+  text-align: center;
+}
+
+.t-atelier .wcs-brand {
+  font-size: 26px;
+}
+
+.t-atelier .wcs-nav ul {
+  justify-content: center;
+}
+
+/* Gallery: dark, a side column for the menu, the work edge to edge. */
+.t-gallery {
+  --grid-cols: 2;
+  --grid-shape: 3 / 2;
+  --grid-gap: 12px;
+  --radius: 0px;
+  --max: none;
+}
+
+.t-gallery .wcs-brand {
+  font-size: 22px;
+}
+
+@media (min-width: 900px) {
+  .t-gallery {
+    display: grid;
+    grid-template-columns: 250px minmax(0, 1fr);
+    grid-template-rows: 1fr auto;
+  }
+
+  .t-gallery .wcs-header {
+    position: sticky;
+    top: 0;
+    grid-row: 1 / span 2;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: 32px;
+    height: 100vh;
+    padding: 40px 32px;
+    border-right: 1px solid var(--line);
+  }
+
+  .t-gallery .wcs-nav ul {
+    flex-direction: column;
+  }
+
+  .t-gallery .wcs-nav a {
+    min-height: 36px;
+  }
+
+  .t-gallery .wcs-main {
+    padding: 28px 28px 64px;
+  }
+
+  .t-gallery .wcs-footer {
+    grid-column: 2;
+    padding-inline: 28px;
+  }
+}
+
+/* Journal: warm paper and a serif. */
+.t-journal {
+  --head-weight: 400;
+  --head-track: -0.015em;
+  --grid-cols: 2;
+  --grid-shape: 5 / 4;
+  --grid-gap: 56px 40px;
+  --radius: 0px;
+}
+
+.t-journal.m-light {
+  --bg: #f6f1e8;
+  --fg: #1e1a15;
+  --muted: #6d6458;
+  --line: #e0d6c5;
+  --surface: #ebe2d2;
+}
+
+.t-journal.m-dark {
+  --bg: #1a1714;
+  --fg: #efe7da;
+  --muted: #a69d8f;
+  --line: #3a342c;
+  --surface: #26221d;
+}
+
+.t-journal .wcs-header {
+  border-bottom: 1px solid var(--line);
+}
+
+.t-journal .wcs-brand {
+  font-size: 28px;
+  font-style: italic;
+  font-weight: 400;
+}
+
+.t-journal .wcs-card-title {
+  font-size: 22px;
+}
+
+.t-journal .wcs-text p {
+  font-size: 19px;
+  line-height: 1.7;
+}
+
+/* Bold: a big name, uppercase type, the accent in charge. */
+.t-bold {
+  --head-weight: 800;
+  --head-track: -0.035em;
+  --grid-cols: 2;
+  --grid-shape: 16 / 10;
+  --grid-gap: 48px 24px;
+  --radius: 0px;
+  --btn-radius: 0px;
+}
+
+.t-bold .wcs-brand {
+  font-size: 22px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.t-bold .wcs-nav a {
+  color: var(--fg);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.t-bold .wcs-hero-title {
+  max-width: none;
+  color: var(--accent);
+  font-size: clamp(48px, 9.5vw, 136px);
+  line-height: 0.92;
+  text-transform: uppercase;
+}
+
+.t-bold .wcs-card-title,
+.t-bold .wcs-project-title {
+  text-transform: uppercase;
+}
+
+.t-bold .wcs-card-title {
+  font-size: 22px;
+}
+
+.t-bold .wcs-text,
+.t-bold .wcs-heading,
+.t-bold .wcs-project-head {
+  margin-inline: 0;
+  text-align: left;
+}
+
+/* Grid: small type, square tiles, titles on hover. */
+.t-grid {
+  --grid-cols: 4;
+  --grid-shape: 1 / 1;
+  --grid-gap: 4px;
+  --radius: 0px;
+  --btn-radius: 0px;
+  --max: 1440px;
+  --head-weight: 500;
+  font-size: 16px;
+}
+
+.t-grid .wcs-header {
+  padding-block: 20px;
+}
+
+.t-grid .wcs-brand {
+  font-size: 16px;
+}
+
+.t-grid .wcs-nav a,
+.t-grid .wcs-tagline,
+.t-grid .wcs-project-year,
+.t-grid .wcs-footer {
+  font-family: var(--mono);
+  font-size: 12px;
+}
+
+.t-grid .wcs-hero-title {
+  max-width: 26ch;
+  font-size: clamp(26px, 3.2vw, 42px);
+  line-height: 1.12;
+}
+
+.t-grid .wcs-text,
+.t-grid .wcs-heading,
+.t-grid .wcs-quote,
+.t-grid .wcs-project-head,
+.t-grid .wcs-contact,
+.t-grid .wcs-social,
+.t-grid .wcs-button {
+  margin-inline: 0;
+  text-align: left;
+}
+
+/* Swiss: black, ruled lines, mono labels. */
+.t-swiss {
+  --radius: 2px;
+  --btn-radius: 2px;
+  --grid-gap: 48px 24px;
+  --head-weight: 600;
+  --head-track: -0.035em;
+}
+
+.t-swiss.m-dark {
+  --bg: #050505;
+  --fg: #f5f3f2;
+  --muted: #8c8890;
+  --line: #262628;
+  --surface: #111113;
+}
+
+.t-swiss.m-light {
+  --bg: #ffffff;
+  --fg: #050505;
+  --muted: #6b6770;
+  --line: #dedbda;
+  --surface: #f5f3f2;
+}
+
+.t-swiss .wcs-header {
+  border-bottom: 1px solid var(--fg);
+}
+
+.t-swiss .wcs-nav a,
+.t-swiss .wcs-tagline,
+.t-swiss .wcs-card-sub,
+.t-swiss .wcs-project-year,
+.t-swiss .wcs-caption,
+.t-swiss .wcs-footer {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.t-swiss .wcs-heading h2,
+.t-swiss .wcs-projects-title {
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+}
+
+.t-swiss .wcs-text,
+.t-swiss .wcs-heading,
+.t-swiss .wcs-quote,
+.t-swiss .wcs-project-head,
+.t-swiss .wcs-contact,
+.t-swiss .wcs-social,
+.t-swiss .wcs-button {
+  margin-inline: 0;
+  text-align: left;
+}
+
+/* ------------------------------------------------------------ small screens */
+
+@media (max-width: 900px) {
+  .wcs-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .wcs-projects.cols-1 .wcs-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .wcs-photos.c-4 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 600px) {
+  .wcs-grid,
+  .wcs-split,
+  .wcs-form {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .t-grid .wcs-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .wcs-photos.c-3 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .wcs-split.side-right .wcs-media {
+    order: 0;
+  }
+
+  .wcs-header {
+    padding-block: 20px;
+  }
+
+  .t-atelier .wcs-header {
+    padding-block: 32px 16px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wcs * {
+    transition: none !important;
+  }
+}
+
+/* ------------------------------------------------------------ editor only */
+
+.wcs-edit .wcs-caption > span:empty::before,
+.wcs-edit .wcs-projects-title > span:empty::before,
+.wcs-edit .wcs-hero-text > span:empty::before,
+.wcs-edit .studio-inline:empty::before {
+  content: attr(data-placeholder);
+  color: var(--muted);
+  opacity: 0.7;
+}
+
+.wcs-edit .wcs-caption > span:empty::before {
+  content: 'Add a caption';
+}
+
+.wcs-edit .wcs-projects-title > span:empty::before {
+  content: 'Add a heading (optional)';
+}
+
+.wcs-edit .wcs-hero-text > span:empty::before {
+  content: 'Add a line about you';
+}
+
+/* Optional words that are still empty show their prompt only while the block
+   is pointed at, so the canvas looks like the finished page the rest of the time. */
+.wcs-edit [data-puck-component]:not(:hover, :focus-within) .wcs-caption:has(> span:empty),
+.wcs-edit [data-puck-component]:not(:hover, :focus-within) .wcs-projects-title:has(> span:empty),
+.wcs-edit [data-puck-component]:not(:hover, :focus-within) .wcs-hero-text:has(> span:empty) {
+  display: none;
+}
+
+.wcs-edit .wcs-spacer {
+  background: repeating-linear-gradient(
+    -45deg,
+    transparent 0 8px,
+    color-mix(in srgb, var(--fg) 6%, transparent) 8px 9px
+  );
+}
+
+.wcs-edit .wcs-nav a,
+.wcs-edit .wcs-card-link {
+  cursor: pointer;
+}
+
+.studio-inline {
+  display: inline-block;
+  min-width: 2ch;
+  border-radius: 3px;
+  outline: none;
+  cursor: text;
+  transition: box-shadow 0.15s;
+}
+
+.studio-inline:hover {
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent) 70%, transparent);
+}
+
+.studio-inline:focus {
+  box-shadow: 0 0 0 2px var(--accent);
+}
+
+.studio-tools {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 3;
+  display: flex;
+  gap: 8px;
+}
+
+.studio-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 36px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 999px;
+  background: rgb(17 17 17 / 0.88);
+  box-shadow: 0 2px 12px rgb(0 0 0 / 0.25);
+  color: #ffffff;
+  font:
+    600 13px/1 var(--font-inter),
+    ui-sans-serif,
+    system-ui,
+    sans-serif;
+  letter-spacing: 0;
+  text-transform: none;
+  cursor: pointer;
+}
+
+.studio-pill:hover {
+  background: #000000;
+}
+
+.studio-pill:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.wcs-card .studio-pill {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 3;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+/* Inside a block Puck turns pointer events off for everything but its own
+   controls, so "hovering the picture" is hovering the block that holds it. */
+[data-puck-component]:hover .wcs-card .studio-pill,
+.wcs-card .studio-pill:focus-visible {
+  opacity: 1;
+}
+
+.wcs-media .studio-tools {
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+[data-puck-component]:hover .wcs-media .studio-tools,
+.wcs-media .studio-tools:focus-within,
+.wcs-media:has(.wcs-placeholder) .studio-tools {
+  opacity: 1;
+}
+
+@media (hover: none) {
+  .wcs-card .studio-pill,
+  .wcs-media .studio-tools {
+    opacity: 1;
+  }
+}
+
+.wcs-project-head .studio-pill {
+  margin-top: 16px;
+}

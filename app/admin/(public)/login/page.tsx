@@ -38,7 +38,8 @@ export default async function LoginPage({
     <LoginForm
       showPasskey={showPasskey}
       showEmailCode={showEmailCode}
-      next={safeNext(next)}
+      // WebCV owners land in the Studio, where their site is.
+      next={safeNext(next) ?? (multi ? '/admin/studio' : undefined)}
       demoHint={isDemoMode() ? `Demo — sign in with ${DEMO_EMAIL} and ${DEMO_PASSPHRASE}.` : null}
     />
   );

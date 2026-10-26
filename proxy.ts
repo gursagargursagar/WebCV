@@ -3,10 +3,22 @@ import { SESSION_COOKIE, SESSION_COOKIE_SECURE } from '@/core/auth/constants';
 import { DEMO_SESSION_COOKIE, DEMO_TTL_SECONDS } from '@/core/demo/config';
 import { arrivedOverHttps, plainHttpContentSecurityPolicy } from '@/core/security/csp';
 import { SITE_COOKIE, SITE_HEADER, isMultiSite, isValidSlug } from '@/core/site/constants';
+import { studioSlugs } from '@/core/studio/routes';
+
+/** Where a published Studio page renders; see `app/wcs-render`. */
+const STUDIO_ROUTE = '/wcs-render';
 
 /** Paths of a portfolio. Reached without a `/<slug>` in front, they lost it somewhere. */
 const SITE_SECTIONS = new Set([
-  'about', 'work', 'writing', 'contact', 'cv', 'share', 'search', 'newsletter', 'case-studies',
+  'about',
+  'work',
+  'writing',
+  'contact',
+  'cv',
+  'share',
+  'search',
+  'newsletter',
+  'case-studies',
 ]);
 
 /** API routes a visitor reaches from someone's public portfolio, not from the admin. */
@@ -35,7 +47,7 @@ function slugFromReferer(req: NextRequest): string | null {
  * cookie only *selects* a store, and the session inside that store is still
  * what authorizes anything (`requireOwner`).
  */
-function routeMultiSite(req: NextRequest): NextResponse | 'admin' | null {
+async function routeMultiSite(req: NextRequest): Promise<NextResponse | 'admin' | null> {
   const { pathname } = req.nextUrl;
   const headers = new Headers(req.headers);
   headers.delete(SITE_HEADER);
@@ -76,6 +88,15 @@ function routeMultiSite(req: NextRequest): NextResponse | 'admin' | null {
       });
       return res;
     }
+    // A portfolio built in the Studio: its pages are served by the Studio's
+    // route, and anything it has no page for (the contact API, the classic
+    // sections) still reaches the ordinary routes.
+    const segment = rest.replace(/^\/|\/$/g, '');
+    if (!segment.includes('/') && segment !== 'api') {
+      const slugs = await studioSlugs(first);
+      if (slugs?.has(segment))
+        return rewrite(segment ? `${STUDIO_ROUTE}/${segment}` : STUDIO_ROUTE, first);
+    }
     return rewrite(rest, first);
   }
 
@@ -103,7 +124,6 @@ function routeMultiSite(req: NextRequest): NextResponse | 'admin' | null {
   return NextResponse.next({ request: { headers } });
 }
 
-
 /**
  * Routing convenience for the admin, and nothing more.
  *
@@ -115,7 +135,7 @@ function routeMultiSite(req: NextRequest): NextResponse | 'admin' | null {
  * this only saves a signed-out visitor from watching the admin shell load
  * before it redirects them.
  */
-export function proxy(req: NextRequest) {
+export async function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
   // Every response carries the request id it was served under, so a log line
@@ -164,7 +184,7 @@ export function proxy(req: NextRequest) {
 
   let adminHeaders: Headers | null = null;
   if (isMultiSite()) {
-    const routed = routeMultiSite(req);
+    const routed = await routeMultiSite(req);
     if (routed !== 'admin') return withId(routed ?? NextResponse.next());
     adminHeaders = new Headers(req.headers);
     adminHeaders.delete(SITE_HEADER);

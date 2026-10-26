@@ -32,6 +32,8 @@ export const RESERVED_TOP_LEVEL: readonly string[] = [
   'api',
   // WebCV's platform pages (front page and sign-up).
   'platform',
+  // Where a published Studio page renders (see proxy.ts).
+  'wcs-render',
   'case-studies',
   'contact',
   'cv',
