@@ -10,6 +10,7 @@ import { isMultiSite, isValidSlug } from '@/core/site/constants';
 import { registerSite, siteByEmail, siteBySlug } from '@/core/site/registry';
 import { runWithSite } from '@/core/site/tenant';
 import { getStorageAdapter } from '@/core/storage/registry';
+import { hasDatabase } from '@/core/storage/adapters/webcv';
 
 /** Where platform-wide counters live; not a valid slug, so no portfolio can be it. */
 const PLATFORM = '_platform';
@@ -33,6 +34,15 @@ export async function POST(req: Request) {
     await assertSameOrigin();
   } catch {
     return NextResponse.json({ ok: false, error: 'Request rejected.' }, { status: 403 });
+  }
+
+  // Said plainly rather than as a generic failure: the form is otherwise fine,
+  // and a visitor should know to come back rather than retry.
+  if (!hasDatabase()) {
+    return NextResponse.json(
+      { ok: false, error: 'Sign-ups open shortly. WebCV is still being connected to its database.' },
+      { status: 503 }
+    );
   }
 
   const limit = await runWithSite(PLATFORM, async () =>

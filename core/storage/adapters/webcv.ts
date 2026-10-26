@@ -26,12 +26,22 @@ import {
  * Neon, Supabase — because nothing here is provider-specific.
  */
 
-function connectionString(): string {
-  const url =
+function configuredUrl(): string | undefined {
+  return (
     process.env.DATABASE_URL ||
     process.env.DATABASE_PUBLIC_URL ||
     process.env.POSTGRES_URL ||
-    process.env.NEON_DATABASE_URL;
+    process.env.NEON_DATABASE_URL
+  );
+}
+
+/** Whether a database is configured at all, for screens that can say so plainly. */
+export function hasDatabase(): boolean {
+  return Boolean(configuredUrl());
+}
+
+function connectionString(): string {
+  const url = configuredUrl();
   if (!url) {
     throw new AdapterConfigError(
       'WebCV needs a Postgres database. Set DATABASE_URL to its connection string.'
