@@ -1,23 +1,22 @@
 import Link from 'next/link';
 
 /**
- * The WebCV mark: a square block with "CV" in mono, after the SCAI block mark,
- * beside a Georgia wordmark. Inverts with the theme (paper on black, black on
- * white) because it is drawn from the text and page colours.
+ * The WebCV mark: the cheese-block logo (`public/brand/`) beside a Georgia
+ * wordmark. The logo carries its own pink ground, so it reads the same on the
+ * dark and light themes; the wordmark follows the text colour.
  */
 export function Brand({ href = '/', suffix }: { href?: string; suffix?: string }) {
   return (
-    <Link
-      href={href}
-      className="inline-flex items-center gap-2.5 text-text-primary no-underline"
-    >
-      <span
-        aria-hidden
-        className="grid h-7 w-7 place-items-center bg-text-primary font-mono text-[11px] font-bold tracking-tight text-bg"
+    <Link href={href} className="inline-flex items-center gap-2.5 text-text-primary no-underline">
+      {/* The cheese-block logo: a CV on a Swiss cheese cube, on its own pink. */}
+      <img
+        src="/brand/webcv-mark.png"
+        alt=""
+        width={36}
+        height={36}
+        className="h-9 w-9 shrink-0"
         style={{ borderRadius: 'var(--radius-md)' }}
-      >
-        CV
-      </span>
+      />
       <span className="font-display text-lg font-bold" style={{ letterSpacing: '-0.035em' }}>
         WebCV
       </span>

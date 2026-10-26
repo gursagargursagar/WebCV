@@ -39,7 +39,10 @@ export async function generateMetadata(): Promise<Metadata> {
   const meta = await buildMetadata();
   return {
     ...meta,
-    icons: { icon: content.seo.favicon || '/favicon.svg' },
+    icons: {
+      icon: content.seo.favicon || '/favicon.png',
+      apple: '/apple-touch-icon.png',
+    },
   };
 }
 

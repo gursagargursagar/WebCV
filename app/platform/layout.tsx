@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     images: [],
   },
   twitter: {
-    card: 'summary',
+    card: 'summary_large_image',
     title: 'WebCV — your portfolio at webcv.au/you',
     description: 'Build a portfolio website in minutes and share webcv.au/your-name.',
     images: [],

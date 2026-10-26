@@ -525,6 +525,7 @@ function TopBar({
         <Icon name="back" />
       </a>
       <span className="studio-wordmark" aria-hidden="true">
+        <img src="/brand/webcv-mark.png" alt="" width={24} height={24} />
         Studio
       </span>
       <label className="studio-page-select">
