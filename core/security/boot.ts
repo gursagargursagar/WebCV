@@ -24,6 +24,7 @@ export interface BootEnv {
   NEON_DATABASE_URL?: string;
   OPB_POSTGRES_URL?: string;
   BLOB_READ_WRITE_TOKEN?: string;
+  WEBCV_MULTI_SITE?: string;
 }
 
 export interface BootCheck {
@@ -55,7 +56,12 @@ export function checkBootConfig(env: BootEnv = process.env): BootCheck {
   // content vanishes on the next deploy. The registry refuses this per request;
   // refusing at boot says it once, loudly, instead of once per page view.
   const explicitLocal = env.OPB_ADAPTER === 'local';
-  if (isEphemeral(env) && (explicitLocal || !hasHostedDb(env))) {
+  if (isEphemeral(env) && !hasHostedDb(env) && env.WEBCV_MULTI_SITE === '1') {
+    // WebCV never falls back to the local adapter (the registry picks the
+    // shared-database one), so nothing can be lost here. The platform pages
+    // and static portfolios keep serving; sign-up reports the missing database.
+    warnings.push('WebCV has no DATABASE_URL yet, so sign-up and portfolios are unavailable.');
+  } else if (isEphemeral(env) && (explicitLocal || !hasHostedDb(env))) {
     errors.push(
       'No hosted database is configured and this host discards the filesystem between ' +
         'deploys, so content would disappear. Configure Supabase, Neon+Blob, or any Postgres ' +

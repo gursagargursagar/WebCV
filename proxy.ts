@@ -211,5 +211,9 @@ export const config = {
    * Static assets are excluded: issuing a cookie alongside a favicon is pure
    * overhead, and `_next/static` is served from a CDN that should never see one.
    */
-  matcher: ['/admin/:path*', '/((?!_next/static|_next/image|favicon.ico).*)'],
+  matcher: [
+    '/admin/:path*',
+    // Static files (images, the hand-built /gursagar24 page's assets) never need the proxy.
+    '/((?!_next/static|_next/image|favicon.ico|gursagar24/img/|.*\\.(?:png|jpe?g|gif|webp|avif|svg|ico|woff2?)$).*)',
+  ],
 };
