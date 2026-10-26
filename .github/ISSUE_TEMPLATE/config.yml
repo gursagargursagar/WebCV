@@ -1,0 +1,11 @@
+# Sends people to the admin first, where the duplicate check and the diagnostics
+# live. Someone arriving here directly gets the templates; someone arriving from
+# the admin already has a filled-in form and has been shown what already exists.
+blank_issues_enabled: true
+contact_links:
+  - name: Report it from your own site's admin instead
+    url: https://github.com/ShadmanArafin/open_portfolio/blob/main/docs/UPDATING.md
+    about: >-
+      Open "Help & feedback" in your admin. It checks whether the thing has
+      already been reported or already fixed, and fills in the version, backend
+      and browser details for you.

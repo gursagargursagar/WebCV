@@ -1,0 +1,14 @@
+/*
+ * Cascade layer order — must load before any layered CSS.
+ *
+ * A layer's position is fixed the first time it appears, so this statement has
+ * to come before anything that uses one. Tailwind's Preflight then lands inside
+ * `tw-preflight` — `index.css` emits it there — and ranks below everything
+ * unlayered, which is what leaves the app's own rules and Tailwind's utilities
+ * free to override a browser default without `!important`.
+ *
+ * Until 2026-10-18 this also ranked Astryx's `reset` and component layers, for
+ * the one island still on that kit. It was ported to plain Tailwind, so the
+ * three stylesheets and the layers that existed to order them are gone.
+ */
+@layer tw-preflight;

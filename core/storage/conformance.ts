@@ -1,0 +1,1040 @@
+import type { CMSState, ContactMessage } from '@/cms/types/cms';
+import type { Subscriber } from '@/core/newsletter/schema';
+import { RevisionConflictError } from './contract';
+import type { StorageAdapter } from './contract';
+
+/**
+ * The shared specification every storage backend must satisfy.
+ *
+ * This is the single thing that makes supporting many backends survivable.
+ * Without it, each adapter is 80% finished in a slightly different way, and the
+ * bugs only appear on someone else's deployment where they cannot be
+ * reproduced. With it, "does this adapter work?" has one answer that anybody
+ * can run.
+ *
+ * Written framework-agnostically — it takes `describe`/`it`/`expect` as
+ * arguments — so the same file can be run by whatever the project happens to
+ * use, and so a contributor adding an adapter has nothing to wire up.
+ */
+
+export interface TestApi {
+  describe: (name: string, fn: () => void) => void;
+  it: (name: string, fn: () => Promise<void> | void) => void;
+  expect: (value: unknown) => {
+    toBe: (expected: unknown) => void;
+    toEqual: (expected: unknown) => void;
+    toBeNull: () => void;
+    toBeTruthy: () => void;
+    toBeGreaterThan: (n: number) => void;
+  };
+}
+
+/** Enough of a content document to be structurally valid. */
+export function makeTestContent(marker: string): CMSState {
+  return {
+    status: 'published',
+    lastSavedAt: '2026-01-01T00:00:00.000Z',
+    lastPublishedAt: '2026-01-01T00:00:00.000Z',
+    settings: { fullName: marker } as CMSState['settings'],
+    microcopy: {} as CMSState['microcopy'],
+    appearance: {} as CMSState['appearance'],
+    seo: { siteTitle: marker } as CMSState['seo'],
+    sections: [],
+    projects: [],
+    caseStudies: [],
+    brands: [],
+    experience: [],
+    education: [],
+    processSteps: [],
+    capabilityGroups: [],
+    recommendations: [],
+    artifacts: [],
+    socialLinks: [],
+    navLinks: [],
+    media: [],
+    messages: [],
+    versions: [],
+    activityLogs: [],
+  };
+}
+
+/**
+ * Runs the full suite against one adapter.
+ *
+ * `reset` must return the backend to an empty state. An adapter that cannot do
+ * that cannot be tested in isolation, and an untestable adapter should not
+ * ship.
+ */
+export interface ConformanceOptions {
+  /**
+   * Skips the media tests.
+   *
+   * For running the shared SQL engine against a bare Postgres, where the
+   * database half is real but there is no object store attached. Better to
+   * verify most of an adapter honestly than to mock the rest and verify
+   * nothing.
+   */
+  skipMedia?: boolean;
+}
+
+export function runConformanceSuite(
+  api: TestApi,
+  adapterName: string,
+  getAdapter: () => Promise<StorageAdapter> | StorageAdapter,
+  reset: () => Promise<void>,
+  options: ConformanceOptions = {}
+): void {
+  const { describe, it, expect } = api;
+
+  /** Registers nothing, so a skipped group simply does not exist. */
+  const skip = (_name: string, _fn: () => void) => {};
+
+  describe(`storage conformance: ${adapterName}`, () => {
+    it('reports its own identity and capabilities', async () => {
+      const adapter = await getAdapter();
+      expect(typeof adapter.id).toBe('string');
+      expect(typeof adapter.displayName).toBe('string');
+      expect(typeof adapter.capabilities.durable).toBe('boolean');
+      expect(typeof adapter.capabilities.maxUploadBytes).toBe('number');
+    });
+
+    it('provisions without error, and again without error', async () => {
+      await reset();
+      const adapter = await getAdapter();
+      await adapter.provision();
+      // Idempotence matters: provisioning runs on boot, so a second call must
+      // not fail and must not wipe anything.
+      await adapter.provision();
+      const health = await adapter.health();
+      expect(health.ok).toBe(true);
+    });
+
+    it('returns null for content that was never written', async () => {
+      await reset();
+      const adapter = await getAdapter();
+      await adapter.provision();
+      expect(await adapter.readSnapshot('published')).toBeNull();
+      expect(await adapter.readSnapshot('draft')).toBeNull();
+    });
+
+    it('round-trips a snapshot without altering it', async () => {
+      await reset();
+      const adapter = await getAdapter();
+      await adapter.provision();
+
+      const content = makeTestContent('round-trip');
+      await adapter.writeSnapshot('published', content);
+
+      const read = await adapter.readSnapshot('published');
+      expect(read?.settings.fullName).toBe('round-trip');
+      // Deep equality, not a spot check: a backend that silently drops empty
+      // arrays or reorders keys will corrupt content over time.
+      expect(read).toEqual(content);
+    });
+
+    it('keeps published and draft separate', async () => {
+      await reset();
+      const adapter = await getAdapter();
+      await adapter.provision();
+
+      await adapter.writeSnapshot('published', makeTestContent('live'));
+      await adapter.writeSnapshot('draft', makeTestContent('work in progress'));
+
+      expect((await adapter.readSnapshot('published'))?.settings.fullName).toBe('live');
+      expect((await adapter.readSnapshot('draft'))?.settings.fullName).toBe('work in progress');
+    });
+
+    it('overwrites rather than appends on a second write', async () => {
+      await reset();
+      const adapter = await getAdapter();
+      await adapter.provision();
+
+      await adapter.writeSnapshot('published', makeTestContent('first'));
+      await adapter.writeSnapshot('published', makeTestContent('second'));
+      expect((await adapter.readSnapshot('published'))?.settings.fullName).toBe('second');
+    });
+
+    it('survives concurrent writes with one of them winning intact', async () => {
+      await reset();
+      const adapter = await getAdapter();
+      await adapter.provision();
+
+      // The requirement is not "last writer wins" — it is that every write
+      // succeeds and the stored document is one of them, never a torn mixture
+      // and never an error. Six writers rather than two, because a two-way race
+      // is easy to win by luck on a fast filesystem and this check exists to
+      // catch the case that only shows up under real contention.
+      const writers = ['a', 'b', 'c', 'd', 'e', 'f'];
+      await Promise.all(
+        writers.map((id) => adapter.writeSnapshot('published', makeTestContent(`writer-${id}`)))
+      );
+
+      const read = await adapter.readSnapshot('published');
+      expect(read !== null).toBe(true);
+      expect(writers.some((id) => read?.settings.fullName === `writer-${id}`)).toBe(true);
+    });
+
+    /*
+     * Revisions.
+     *
+     * Every adapter has to agree on this or the guarantee is worthless: an
+     * owner editing on a laptop and a phone must not be able to lose an
+     * afternoon's work silently, whichever backend they picked. Last-write-wins
+     * is the default behaviour of every store here, so the check has to be
+     * explicit in each of them.
+     */
+    describe('revisions', () => {
+      it('starts at nothing and counts up from the first write', async () => {
+        await reset();
+        const adapter = await getAdapter();
+        await adapter.provision();
+
+        expect(await adapter.readSnapshotMeta('published')).toBeNull();
+
+        const first = await adapter.writeSnapshot('published', makeTestContent('one'));
+        expect(first).toBe(1);
+
+        const meta = await adapter.readSnapshotMeta('published');
+        expect(meta?.revision).toBe(1);
+        expect(meta?.state.settings.fullName).toBe('one');
+
+        expect(await adapter.writeSnapshot('published', makeTestContent('two'))).toBe(2);
+      });
+
+      it('accepts a conditional write that still matches', async () => {
+        await reset();
+        const adapter = await getAdapter();
+        await adapter.provision();
+
+        await adapter.writeSnapshot('published', makeTestContent('one'));
+        const meta = await adapter.readSnapshotMeta('published');
+
+        const next = await adapter.writeSnapshot(
+          'published',
+          makeTestContent('two'),
+          meta!.revision
+        );
+        expect(next).toBe(2);
+        expect((await adapter.readSnapshot('published'))?.settings.fullName).toBe('two');
+      });
+
+      it('refuses a conditional write whose revision has moved on', async () => {
+        await reset();
+        const adapter = await getAdapter();
+        await adapter.provision();
+
+        await adapter.writeSnapshot('published', makeTestContent('one'));
+        const stale = (await adapter.readSnapshotMeta('published'))!.revision;
+
+        // Somebody else saves in between — the second tab, the other device.
+        await adapter.writeSnapshot('published', makeTestContent('two'));
+
+        let rejected: unknown = null;
+        try {
+          await adapter.writeSnapshot('published', makeTestContent('three'), stale);
+        } catch (err) {
+          rejected = err;
+        }
+        expect(rejected instanceof RevisionConflictError).toBe(true);
+
+        // And the rejected write left nothing behind.
+        expect((await adapter.readSnapshot('published'))?.settings.fullName).toBe('two');
+      });
+
+      it('treats an absent snapshot as revision 0', async () => {
+        await reset();
+        const adapter = await getAdapter();
+        await adapter.provision();
+
+        // The first save from a fresh install has nothing to compare against.
+        expect(await adapter.writeSnapshot('draft', makeTestContent('first'), 0)).toBe(1);
+      });
+
+      it('lets exactly one of two racing conditional writes win', async () => {
+        await reset();
+        const adapter = await getAdapter();
+        await adapter.provision();
+
+        await adapter.writeSnapshot('published', makeTestContent('base'));
+        const shared = (await adapter.readSnapshotMeta('published'))!.revision;
+
+        // Two tabs that both loaded the same version and both hit save. This is
+        // the situation the whole mechanism exists for, and "both succeeded" is
+        // the wrong answer even though nothing errored.
+        const results = await Promise.allSettled([
+          adapter.writeSnapshot('published', makeTestContent('tab-one'), shared),
+          adapter.writeSnapshot('published', makeTestContent('tab-two'), shared),
+        ]);
+
+        expect(results.filter((r) => r.status === 'fulfilled').length).toBe(1);
+        expect(results.filter((r) => r.status === 'rejected').length).toBe(1);
+        expect((await adapter.readSnapshotMeta('published'))?.revision).toBe(shared + 1);
+      });
+
+      it('keeps a revision per channel', async () => {
+        await reset();
+        const adapter = await getAdapter();
+        await adapter.provision();
+
+        await adapter.writeSnapshot('draft', makeTestContent('d1'));
+        await adapter.writeSnapshot('draft', makeTestContent('d2'));
+        await adapter.writeSnapshot('published', makeTestContent('p1'));
+
+        expect((await adapter.readSnapshotMeta('draft'))?.revision).toBe(2);
+        expect((await adapter.readSnapshotMeta('published'))?.revision).toBe(1);
+      });
+    });
+
+    describe('config that outlives its process', () => {
+      it('keeps a value with no expiry, and still forgets one with a short one', async () => {
+        await reset();
+        const adapter = await getAdapter();
+        await adapter.provision();
+
+        // Integration settings are not short-lived state. Storing them with a
+        // very long TTL instead would mean somebody's mail server quietly stops
+        // working on a date nobody chose.
+        await adapter.kv.set('config', 'smtp', { host: 'mail.example.com' });
+        expect(await adapter.kv.get('config', 'smtp')).toEqual({ host: 'mail.example.com' });
+
+        await adapter.kv.set('otp', 'code', 'temporary', 1);
+        await new Promise((resolve) => setTimeout(resolve, 1100));
+        expect(await adapter.kv.get('otp', 'code')).toBeNull();
+
+        // And the permanent one survived a sweep triggered by the write above.
+        expect(await adapter.kv.get('config', 'smtp')).toEqual({ host: 'mail.example.com' });
+      });
+
+      it('overwrites and deletes config like any other entry', async () => {
+        await reset();
+        const adapter = await getAdapter();
+        await adapter.provision();
+
+        await adapter.kv.set('config', 'smtp', { host: 'one' });
+        await adapter.kv.set('config', 'smtp', { host: 'two' });
+        expect(await adapter.kv.get('config', 'smtp')).toEqual({ host: 'two' });
+
+        await adapter.kv.del('config', 'smtp');
+        expect(await adapter.kv.get('config', 'smtp')).toBeNull();
+      });
+    });
+
+    // Skipped when there is no object store attached — see ConformanceOptions.
+    const describeMedia = options.skipMedia ? skip : describe;
+
+    describeMedia('media', () => {
+      it('stores, resolves and removes an asset', async () => {
+        await reset();
+        const adapter = await getAdapter();
+        await adapter.provision();
+
+        const bytes = new Uint8Array([0x89, 0x50, 0x4e, 0x47]);
+        const record = await adapter.media.put('conformance.png', bytes, 'image/png');
+
+        expect(record.key).toBe('conformance.png');
+        expect(record.sizeBytes).toBe(4);
+        // A URL, never a Blob. Downloading every asset to build an object URL
+        // is what the previous design forced and this one exists to avoid.
+        expect(typeof record.url).toBe('string');
+
+        expect(typeof (await adapter.media.resolveUrl('conformance.png'))).toBe('string');
+
+        await adapter.media.remove('conformance.png');
+        expect(await adapter.media.resolveUrl('conformance.png')).toBeNull();
+      });
+
+      it('returns null for an asset that does not exist', async () => {
+        await reset();
+        const adapter = await getAdapter();
+        await adapter.provision();
+        expect(await adapter.media.resolveUrl('never-uploaded.png')).toBeNull();
+      });
+
+      it('removing something already gone is not an error', async () => {
+        await reset();
+        const adapter = await getAdapter();
+        await adapter.provision();
+        // Delete is expected to be idempotent: the caller wants it absent, and
+        // it is absent.
+        await adapter.media.remove('never-uploaded.png');
+      });
+
+      it('lists what has been stored', async () => {
+        await reset();
+        const adapter = await getAdapter();
+        await adapter.provision();
+
+        await adapter.media.put('one.png', new Uint8Array([1]), 'image/png');
+        await adapter.media.put('two.png', new Uint8Array([2, 3]), 'image/png');
+
+        const listed = await adapter.media.list();
+        const keys = listed.map((m) => m.key).sort();
+        expect(keys.includes('one.png')).toBe(true);
+        expect(keys.includes('two.png')).toBe(true);
+      });
+    });
+
+    describe('messages', () => {
+      const enquiry = (id: string, receivedAt: string): ContactMessage => ({
+        id,
+        name: `Sender ${id}`,
+        email: `${id}@example.com`,
+        company: '',
+        projectType: '',
+        message: 'Hello.',
+        receivedAt,
+        status: 'unread',
+      });
+
+      it('is empty on a fresh instance', async () => {
+        await reset();
+        const adapter = await getAdapter();
+        await adapter.provision();
+        expect((await adapter.messages.list()).length).toBe(0);
+      });
+
+      it('round-trips an enquiry', async () => {
+        await reset();
+        const adapter = await getAdapter();
+        await adapter.provision();
+
+        await adapter.messages.append(enquiry('a', '2026-01-01T00:00:00.000Z'));
+        const listed = await adapter.messages.list();
+        expect(listed.length).toBe(1);
+        expect(listed[0].email).toBe('a@example.com');
+        expect(listed[0].status).toBe('unread');
+      });
+
+      it('lists newest first', async () => {
+        await reset();
+        const adapter = await getAdapter();
+        await adapter.provision();
+
+        await adapter.messages.append(enquiry('older', '2026-01-01T00:00:00.000Z'));
+        await adapter.messages.append(enquiry('newer', '2026-06-01T00:00:00.000Z'));
+
+        const listed = await adapter.messages.list();
+        expect(listed[0].id).toBe('newer');
+        expect(listed[1].id).toBe('older');
+      });
+
+      it('honours a limit', async () => {
+        await reset();
+        const adapter = await getAdapter();
+        await adapter.provision();
+
+        for (let i = 0; i < 5; i++) {
+          await adapter.messages.append(enquiry(`m${i}`, `2026-01-0${i + 1}T00:00:00.000Z`));
+        }
+        expect((await adapter.messages.list({ limit: 2 })).length).toBe(2);
+      });
+
+      it('loses nothing when fifty arrive at once', async () => {
+        await reset();
+        const adapter = await getAdapter();
+        await adapter.provision();
+
+        // The reason this surface exists. Appending to the content snapshot was
+        // a read-modify-write, so two simultaneous enquiries kept one. An inbox
+        // may not do that, however acceptable it is for a content document.
+        await Promise.all(
+          Array.from({ length: 50 }, (_, i) =>
+            adapter.messages.append(enquiry(`c${i}`, '2026-01-01T00:00:00.000Z'))
+          )
+        );
+
+        expect((await adapter.messages.list()).length).toBe(50);
+      });
+
+      it('patches a status without touching the rest', async () => {
+        await reset();
+        const adapter = await getAdapter();
+        await adapter.provision();
+
+        await adapter.messages.append(enquiry('a', '2026-01-01T00:00:00.000Z'));
+        await adapter.messages.update('a', { status: 'read' });
+
+        const listed = await adapter.messages.list();
+        expect(listed[0].status).toBe('read');
+        expect(listed[0].email).toBe('a@example.com');
+      });
+
+      it('keeps both patches when two updates race on the same id', async () => {
+        await reset();
+        const adapter = await getAdapter();
+        await adapter.provision();
+
+        await adapter.messages.append(enquiry('racer', '2026-01-01T00:00:00.000Z'));
+
+        // Different fields, so a correct merge keeps both. A read that happens
+        // outside the per-id serialisation lets both calls read the same
+        // pre-patch row, and whichever writes last silently discards the
+        // other's patch rather than merging with it.
+        await Promise.all([
+          adapter.messages.update('racer', { status: 'read' }),
+          adapter.messages.update('racer', { company: 'Northwind' }),
+        ]);
+
+        const listed = await adapter.messages.list();
+        expect(listed.length).toBe(1);
+        expect(listed[0].status).toBe('read');
+        expect(listed[0].company).toBe('Northwind');
+      });
+
+      it('ignores a patch for something that is not there', async () => {
+        await reset();
+        const adapter = await getAdapter();
+        await adapter.provision();
+
+        await adapter.messages.append(enquiry('real', '2026-01-01T00:00:00.000Z'));
+        await adapter.messages.update('never-existed', { status: 'read' });
+
+        // The point is that a patch for a missing id is a no-op rather than an
+        // error, *and* that it does not create a row out of a partial.
+        const listed = await adapter.messages.list();
+        expect(listed.length).toBe(1);
+        expect(listed[0].id).toBe('real');
+      });
+
+      it('removes one, and removing it twice is not an error', async () => {
+        await reset();
+        const adapter = await getAdapter();
+        await adapter.provision();
+
+        await adapter.messages.append(enquiry('a', '2026-01-01T00:00:00.000Z'));
+        await adapter.messages.remove('a');
+        await adapter.messages.remove('a');
+        expect((await adapter.messages.list()).length).toBe(0);
+      });
+
+      it('moves enquiries out of an old snapshot on provision, once', async () => {
+        await reset();
+        const adapter = await getAdapter();
+        await adapter.provision();
+
+        // What an instance upgraded from a previous version looks like.
+        const legacy = makeTestContent('legacy');
+        legacy.messages = [enquiry('old-1', '2026-01-01T00:00:00.000Z')];
+        await adapter.writeSnapshot('published', legacy);
+
+        await adapter.provision();
+        expect((await adapter.messages.list()).length).toBe(1);
+        expect((await adapter.readSnapshot('published'))?.messages.length).toBe(0);
+
+        // Idempotent: boot happens on every cold start, and on several at once.
+        await adapter.provision();
+        await adapter.provision();
+        expect((await adapter.messages.list()).length).toBe(1);
+      });
+    });
+
+    describe('subscribers', () => {
+      const signup = (id: string, requestedAt: string): Subscriber => ({
+        id,
+        email: `${id}@example.com`,
+        status: 'pending',
+        confirmTokenHash: `hash-${id}`,
+        unsubscribeTokenHash: `unsub-${id}`,
+        requestedAt,
+      });
+
+      it('is empty on a fresh instance', async () => {
+        await reset();
+        const adapter = await getAdapter();
+        await adapter.provision();
+        expect((await adapter.subscribers.list()).length).toBe(0);
+      });
+
+      it('round-trips a sign-up, newest first', async () => {
+        await reset();
+        const adapter = await getAdapter();
+        await adapter.provision();
+
+        await adapter.subscribers.append(signup('older', '2026-01-01T00:00:00.000Z'));
+        await adapter.subscribers.append(signup('newer', '2026-06-01T00:00:00.000Z'));
+
+        const listed = await adapter.subscribers.list();
+        expect(listed.length).toBe(2);
+        expect(listed[0].id).toBe('newer');
+        expect(listed[0].email).toBe('newer@example.com');
+        expect(listed[0].confirmTokenHash).toBe('hash-newer');
+      });
+
+      it('loses nothing when fifty sign up at once', async () => {
+        await reset();
+        const adapter = await getAdapter();
+        await adapter.provision();
+
+        // The reason this has its own surface rather than living in the content
+        // document: strangers append to it concurrently, and a
+        // read-modify-write on a shared blob keeps one of them.
+        await Promise.all(
+          Array.from({ length: 50 }, (_, i) =>
+            adapter.subscribers.append(signup(`s${i}`, '2026-01-01T00:00:00.000Z'))
+          )
+        );
+
+        expect((await adapter.subscribers.list()).length).toBe(50);
+      });
+
+      it('confirms without disturbing the rest of the record', async () => {
+        await reset();
+        const adapter = await getAdapter();
+        await adapter.provision();
+
+        await adapter.subscribers.append(signup('a', '2026-01-01T00:00:00.000Z'));
+        await adapter.subscribers.update('a', {
+          status: 'confirmed',
+          confirmedAt: '2026-01-02T00:00:00.000Z',
+        });
+
+        const [stored] = await adapter.subscribers.list();
+        expect(stored.status).toBe('confirmed');
+        expect(stored.email).toBe('a@example.com');
+        expect(stored.unsubscribeTokenHash).toBe('unsub-a');
+      });
+
+      it('can empty a token so it cannot be used twice', async () => {
+        await reset();
+        const adapter = await getAdapter();
+        await adapter.provision();
+
+        await adapter.subscribers.append(signup('a', '2026-01-01T00:00:00.000Z'));
+        await adapter.subscribers.update('a', { status: 'confirmed', confirmTokenHash: '' });
+
+        // Emptied, not deleted, and this assertion is why. Spreading a patch
+        // over an object treats `undefined` as "remove the key"; merging it as
+        // jsonb drops `undefined` before it reaches the database, so the old
+        // value survives. One of those backends would have left a confirmation
+        // link working forever — including after the person unsubscribed.
+        const [stored] = await adapter.subscribers.list();
+        expect(stored.confirmTokenHash ?? '').toBe('');
+      });
+
+      it('keeps both patches when two updates race on the same id', async () => {
+        await reset();
+        const adapter = await getAdapter();
+        await adapter.provision();
+
+        await adapter.subscribers.append(signup('racer', '2026-01-01T00:00:00.000Z'));
+
+        await Promise.all([
+          adapter.subscribers.update('racer', { status: 'confirmed' }),
+          adapter.subscribers.update('racer', { source: '/writing' }),
+        ]);
+
+        const [stored] = await adapter.subscribers.list();
+        expect(stored.status).toBe('confirmed');
+        expect(stored.source).toBe('/writing');
+      });
+
+      it('ignores a patch for somebody who is not there', async () => {
+        await reset();
+        const adapter = await getAdapter();
+        await adapter.provision();
+
+        await adapter.subscribers.append(signup('real', '2026-01-01T00:00:00.000Z'));
+        await adapter.subscribers.update('never-existed', { status: 'confirmed' });
+
+        const listed = await adapter.subscribers.list();
+        expect(listed.length).toBe(1);
+        expect(listed[0].id).toBe('real');
+      });
+
+      it('removes one, and removing it twice is not an error', async () => {
+        await reset();
+        const adapter = await getAdapter();
+        await adapter.provision();
+
+        // Somebody writing "take me off your list" by hand is a request the
+        // owner has to be able to honour, so this is a real path, not cleanup.
+        await adapter.subscribers.append(signup('a', '2026-01-01T00:00:00.000Z'));
+        await adapter.subscribers.remove('a');
+        await adapter.subscribers.remove('a');
+        expect((await adapter.subscribers.list()).length).toBe(0);
+      });
+
+      it('never lets a subscriber into the content snapshot', async () => {
+        await reset();
+        const adapter = await getAdapter();
+        await adapter.provision();
+
+        await adapter.subscribers.append(signup('a', '2026-01-01T00:00:00.000Z'));
+        await adapter.writeSnapshot('published', makeTestContent('site'));
+
+        // The published snapshot is serialised into the HTML of every public
+        // page and copied whole by the backup button. A list of strangers'
+        // email addresses must be in neither, and the only guarantee of that is
+        // that the two never share a store.
+        const snapshot = JSON.stringify(await adapter.readSnapshot('published'));
+        expect(snapshot.includes('a@example.com')).toBe(false);
+      });
+    });
+
+    describe('passkeys', () => {
+      const credential = (id: string, counter = 0) => ({
+        id,
+        publicKey: Buffer.from(`cose-key-for-${id}`).toString('base64'),
+        counter,
+        transports: ['internal'],
+        deviceName: `Device ${id}`,
+        createdAt: '2026-01-01T00:00:00.000Z',
+        lastUsedAt: null as string | null,
+        backedUp: false,
+      });
+
+      it('is empty on a fresh instance', async () => {
+        await reset();
+        const adapter = await getAdapter();
+        await adapter.provision();
+        expect(await adapter.passkeys.list()).toEqual([]);
+        expect(await adapter.passkeys.get('never-existed')).toBeNull();
+      });
+
+      it('round-trips a credential', async () => {
+        await reset();
+        const adapter = await getAdapter();
+        await adapter.provision();
+
+        await adapter.passkeys.put(credential('cred-a'));
+        expect(await adapter.passkeys.get('cred-a')).toEqual(credential('cred-a'));
+      });
+
+      it('replaces on re-put and merges counter updates', async () => {
+        await reset();
+        const adapter = await getAdapter();
+        await adapter.provision();
+
+        await adapter.passkeys.put(credential('cred-a'));
+        await adapter.passkeys.put({ ...credential('cred-a'), counter: 7 });
+        expect((await adapter.passkeys.list()).filter((c) => c.id === 'cred-a').length).toBe(1);
+
+        await adapter.passkeys.update('cred-a', {
+          counter: 8,
+          lastUsedAt: '2026-02-01T00:00:00.000Z',
+        });
+        expect(await adapter.passkeys.get('cred-a')).toEqual({
+          ...credential('cred-a'),
+          counter: 8,
+          lastUsedAt: '2026-02-01T00:00:00.000Z',
+        });
+      });
+
+      it('ignores unknown ids and removes cleanly', async () => {
+        await reset();
+        const adapter = await getAdapter();
+        await adapter.provision();
+
+        await adapter.passkeys.put(credential('cred-a'));
+        await adapter.passkeys.update('never-existed', { counter: 1 });
+        await adapter.passkeys.remove('never-existed');
+        expect((await adapter.passkeys.list()).map((c) => c.id)).toEqual(['cred-a']);
+
+        await adapter.passkeys.remove('cred-a');
+        await adapter.passkeys.remove('cred-a');
+        expect(await adapter.passkeys.list()).toEqual([]);
+      });
+
+      it('never lets credential material into the content snapshot', async () => {
+        await reset();
+        const adapter = await getAdapter();
+        await adapter.provision();
+
+        await adapter.passkeys.put(credential('cred-a'));
+        await adapter.writeSnapshot('published', makeTestContent('site'));
+
+        const snapshot = JSON.stringify(await adapter.readSnapshot('published'));
+        expect(snapshot.includes('cred-a')).toBe(false);
+        expect(snapshot.includes(Buffer.from('cose-key-for-cred-a').toString('base64'))).toBe(
+          false
+        );
+      });
+    });
+
+    describe('records', () => {
+      it('is empty on a fresh collection', async () => {
+        await reset();
+        const adapter = await getAdapter();
+        await adapter.provision();
+
+        expect((await adapter.records.list('posts')).records).toEqual([]);
+        expect((await adapter.records.list('posts')).nextCursor).toBeNull();
+        expect(await adapter.records.get('posts', 'hello')).toBeNull();
+        expect(await adapter.records.collections()).toEqual([]);
+      });
+
+      it('round-trips a record with revision 1', async () => {
+        await reset();
+        const adapter = await getAdapter();
+        await adapter.provision();
+
+        const written = await adapter.records.put('posts', 'hello', { title: 'Hello' });
+        expect(written.id).toBe('hello');
+        expect(written.revision).toBe(1);
+        expect(typeof written.updatedAt).toBe('string');
+        expect(await adapter.records.get('posts', 'hello')).toEqual(written);
+      });
+
+      it('counts revisions and enforces conditional writes', async () => {
+        await reset();
+        const adapter = await getAdapter();
+        await adapter.provision();
+
+        const first = await adapter.records.put('posts', 'hello', { n: 1 });
+        const second = await adapter.records.put('posts', 'hello', { n: 2 }, first.revision);
+        expect(second.revision).toBe(first.revision + 1);
+        expect(second.data).toEqual({ n: 2 });
+
+        let conflicted = false;
+        try {
+          await adapter.records.put('posts', 'hello', { n: 3 }, first.revision);
+        } catch (err) {
+          conflicted = err instanceof RevisionConflictError;
+        }
+        expect(conflicted).toBe(true);
+        expect(await adapter.records.get('posts', 'hello')).toEqual(second);
+      });
+
+      it('treats an absent record as revision 0', async () => {
+        await reset();
+        const adapter = await getAdapter();
+        await adapter.provision();
+
+        const written = await adapter.records.put('posts', 'hello', { n: 1 }, 0);
+        expect(written.revision).toBe(1);
+      });
+
+      it('lets exactly one of two racing conditional writes win', async () => {
+        await reset();
+        const adapter = await getAdapter();
+        await adapter.provision();
+
+        const first = await adapter.records.put('posts', 'hello', { n: 1 });
+        const results = await Promise.allSettled([
+          adapter.records.put('posts', 'hello', { n: 2 }, first.revision),
+          adapter.records.put('posts', 'hello', { n: 3 }, first.revision),
+        ]);
+        const won = results.filter((r) => r.status === 'fulfilled').length;
+        const lost = results.filter(
+          (r) => r.status === 'rejected' && r.reason instanceof RevisionConflictError
+        ).length;
+        expect(won).toBe(1);
+        expect(lost).toBe(1);
+        expect(
+          ((await adapter.records.get('posts', 'hello')) as { revision: number }).revision
+        ).toBe(first.revision + 1);
+      });
+
+      it('paginates newest first', async () => {
+        await reset();
+        const adapter = await getAdapter();
+        await adapter.provision();
+
+        for (let i = 0; i < 5; i++) {
+          await adapter.records.put('posts', `p${i}`, { n: i });
+        }
+        const page1 = await adapter.records.list('posts', { limit: 2 });
+        expect(page1.records.length).toBe(2);
+        expect(typeof page1.nextCursor).toBe('string');
+        const page2 = await adapter.records.list('posts', { limit: 2, cursor: page1.nextCursor });
+        expect(page2.records.length).toBe(2);
+        const page3 = await adapter.records.list('posts', { limit: 2, cursor: page2.nextCursor });
+        expect(page3.records.length).toBe(1);
+        expect(page3.nextCursor).toBeNull();
+        const ids = [...page1.records, ...page2.records, ...page3.records].map((r) => r.id);
+        expect([...ids].sort()).toEqual(['p0', 'p1', 'p2', 'p3', 'p4']);
+      });
+
+      it('removes, and removing twice is not an error', async () => {
+        await reset();
+        const adapter = await getAdapter();
+        await adapter.provision();
+
+        await adapter.records.put('posts', 'hello', { n: 1 });
+        await adapter.records.remove('posts', 'hello');
+        await adapter.records.remove('posts', 'hello');
+        expect(await adapter.records.get('posts', 'hello')).toBeNull();
+      });
+
+      it('rejects addresses that cannot be files, keys and URL segments at once', async () => {
+        await reset();
+        const adapter = await getAdapter();
+        await adapter.provision();
+
+        for (const [collection, id] of [
+          ['Posts', 'hello'],
+          ['posts', 'Hello'],
+          ['posts', '../owner'],
+          ['', 'hello'],
+        ] as const) {
+          let threw = false;
+          try {
+            await adapter.records.put(collection, id, {});
+          } catch {
+            threw = true;
+          }
+          expect(threw).toBe(true);
+        }
+      });
+
+      it('round-trips singletons apart from records', async () => {
+        await reset();
+        const adapter = await getAdapter();
+        await adapter.provision();
+
+        expect(await adapter.records.getSingleton('settings')).toBeNull();
+        await adapter.records.putSingleton('settings', { theme: 'editorial' });
+        expect(await adapter.records.getSingleton('settings')).toEqual({ theme: 'editorial' });
+        await adapter.records.putSingleton('settings', { theme: 'terminal' });
+        expect(await adapter.records.getSingleton('settings')).toEqual({ theme: 'terminal' });
+      });
+
+      it('lists collections that hold records', async () => {
+        await reset();
+        const adapter = await getAdapter();
+        await adapter.provision();
+
+        await adapter.records.put('posts', 'a', {});
+        await adapter.records.put('pages', 'b', {});
+        expect((await adapter.records.collections()).sort()).toEqual(['pages', 'posts']);
+        await adapter.records.remove('posts', 'a');
+        expect(await adapter.records.collections()).toEqual(['pages']);
+      });
+
+      it('never lets records into the content snapshot', async () => {
+        await reset();
+        const adapter = await getAdapter();
+        await adapter.provision();
+
+        await adapter.records.put('posts', 'hello', { title: 'Hello' });
+        await adapter.writeSnapshot('published', makeTestContent('site'));
+
+        const snapshot = JSON.stringify(await adapter.readSnapshot('published'));
+        expect(snapshot.includes('Hello')).toBe(false);
+      });
+    });
+
+    describe('owner', () => {
+      it('is null before the site is claimed', async () => {
+        await reset();
+        const adapter = await getAdapter();
+        await adapter.provision();
+        expect(await adapter.readOwner()).toBeNull();
+      });
+
+      it('round-trips the owner record', async () => {
+        await reset();
+        const adapter = await getAdapter();
+        await adapter.provision();
+
+        const owner = {
+          email: 'owner@example.com',
+          passphraseHash: 'scrypt$1$2$3$abc$def',
+          createdAt: '2026-01-01T00:00:00.000Z',
+          sessionEpoch: 1,
+        };
+        await adapter.writeOwner(owner);
+        expect(await adapter.readOwner()).toEqual(owner);
+      });
+    });
+
+    describe('kv', () => {
+      it('stores and reads a value back', async () => {
+        await reset();
+        const adapter = await getAdapter();
+        await adapter.provision();
+
+        await adapter.kv.set('session', 'abc', { email: 'a@example.com' }, 60);
+        expect(await adapter.kv.get('session', 'abc')).toEqual({ email: 'a@example.com' });
+      });
+
+      it('returns null for a key that was never set', async () => {
+        await reset();
+        const adapter = await getAdapter();
+        await adapter.provision();
+        expect(await adapter.kv.get('session', 'missing')).toBeNull();
+      });
+
+      it('treats an expired value as absent', async () => {
+        await reset();
+        const adapter = await getAdapter();
+        await adapter.provision();
+
+        // A zero TTL is already in the past by the time it is read. Sessions
+        // outliving their expiry is the failure this guards against.
+        await adapter.kv.set('session', 'expired', 'value', 0);
+        expect(await adapter.kv.get('session', 'expired')).toBeNull();
+      });
+
+      it('deletes a value', async () => {
+        await reset();
+        const adapter = await getAdapter();
+        await adapter.provision();
+
+        await adapter.kv.set('session', 'doomed', 'value', 60);
+        await adapter.kv.del('session', 'doomed');
+        expect(await adapter.kv.get('session', 'doomed')).toBeNull();
+      });
+
+      it('counts upwards on incr', async () => {
+        await reset();
+        const adapter = await getAdapter();
+        await adapter.provision();
+
+        expect(await adapter.kv.incr('ratelimit', 'hits', 60)).toBe(1);
+        expect(await adapter.kv.incr('ratelimit', 'hits', 60)).toBe(2);
+        expect(await adapter.kv.incr('ratelimit', 'hits', 60)).toBe(3);
+      });
+
+      it('keeps namespaces apart', async () => {
+        await reset();
+        const adapter = await getAdapter();
+        await adapter.provision();
+
+        await adapter.kv.set('session', 'same-key', 'session value', 60);
+        await adapter.kv.set('otp', 'same-key', 'otp value', 60);
+
+        expect(await adapter.kv.get('session', 'same-key')).toBe('session value');
+        expect(await adapter.kv.get('otp', 'same-key')).toBe('otp value');
+      });
+
+      it('clears one namespace without touching another', async () => {
+        await reset();
+        const adapter = await getAdapter();
+        await adapter.provision();
+
+        await adapter.kv.set('session', 'a', 1, 60);
+        await adapter.kv.set('otp', 'b', 2, 60);
+
+        // "Sign out everywhere" must not also reset rate limits or pending
+        // one-time codes.
+        await adapter.kv.clear('session');
+        expect(await adapter.kv.get('session', 'a')).toBeNull();
+        expect(await adapter.kv.get('otp', 'b')).toBe(2);
+      });
+    });
+
+    describe('isolation between content and auth state', () => {
+      it('does not put sessions or the owner inside the content snapshot', async () => {
+        await reset();
+        const adapter = await getAdapter();
+        await adapter.provision();
+
+        await adapter.writeOwner({
+          email: 'owner@example.com',
+          passphraseHash: 'scrypt$secret',
+          createdAt: '2026-01-01T00:00:00.000Z',
+          sessionEpoch: 1,
+        });
+        await adapter.kv.set('session', 'token-hash', { email: 'owner@example.com' }, 60);
+        await adapter.writeSnapshot('published', makeTestContent('exported'));
+
+        // A content export is something users hand around. A passphrase hash
+        // or a live session travelling with it would be a serious leak.
+        const snapshot = JSON.stringify(await adapter.readSnapshot('published'));
+        expect(snapshot.includes('scrypt$secret')).toBe(false);
+        expect(snapshot.includes('token-hash')).toBe(false);
+      });
+    });
+  });
+}

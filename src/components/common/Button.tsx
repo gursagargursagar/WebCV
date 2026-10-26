@@ -1,0 +1,103 @@
+'use client';
+
+import React from 'react';
+import { cn } from '../../utils/cn';
+import { trackEvent } from '../../utils/analytics';
+
+import Link from '@/core/site/link';
+interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  variant?: 'primary' | 'secondary' | 'outline' | 'whatsapp';
+  to?: string;
+  href?: string;
+  icon?: React.ReactNode;
+  iconPosition?: 'left' | 'right';
+  children: React.ReactNode;
+  className?: string;
+  /**
+   * An analytics event to record when it is used. Data, not a callback, so a
+   * server component can set it; and it works on links too — the link
+   * variants used to drop `onClick`, so "Live site clicked" was never sent.
+   */
+  track?: { name: string; props?: Record<string, unknown> };
+}
+
+export const Button: React.FC<ButtonProps> = ({
+  variant = 'primary',
+  to,
+  href,
+  icon,
+  iconPosition = 'right',
+  children,
+  className,
+  track,
+  ...props
+}) => {
+  const onTrack = track ? () => trackEvent(track.name, track.props) : undefined;
+  // Global Button Height: EXACTLY 42px across desktop, tablet, and mobile
+  const baseStyles =
+    'inline-flex items-center justify-center gap-2 h-[42px] px-5 sm:px-6 rounded-full font-sans text-[13px] sm:text-sm font-medium uppercase tracking-wider transition-all duration-250 ease-out whitespace-nowrap group cursor-pointer select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent';
+
+  const variants = {
+    primary: 'bg-text-primary text-bg hover:opacity-90 shadow-sm hover:-translate-y-[1px]',
+    secondary:
+      'bg-transparent text-text-primary border border-border hover:border-text-primary/40 hover:bg-surface-primary hover:-translate-y-[1px]',
+    outline:
+      'bg-transparent text-text-secondary border border-border hover:text-text-primary hover:border-text-primary/40',
+    // Token colours, not brand green: white on #25D366 is ~2.5:1 and no theme
+    // can fix a hardcoded pair. The icon carries the brand (see call sites);
+    // the contrast carries the readability.
+    whatsapp:
+      'bg-[var(--btn-primary-bg)] text-[var(--btn-primary-text)] shadow-sm hover:-translate-y-[1px]',
+  };
+
+  const content = (
+    <>
+      {icon && iconPosition === 'left' && (
+        <span className="transition-transform duration-250 group-hover:-translate-x-0.5 flex-shrink-0">
+          {icon}
+        </span>
+      )}
+      <span>{children}</span>
+      {icon && iconPosition === 'right' && (
+        <span className="transition-transform duration-250 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 flex-shrink-0">
+          {icon}
+        </span>
+      )}
+    </>
+  );
+
+  if (to) {
+    return (
+      <Link href={to} onClick={onTrack} className={cn(baseStyles, variants[variant], className)}>
+        {content}
+      </Link>
+    );
+  }
+
+  if (href) {
+    return (
+      <a
+        href={href}
+        target="_blank"
+        rel="noopener noreferrer"
+        onClick={onTrack}
+        className={cn(baseStyles, variants[variant], className)}
+      >
+        {content}
+      </a>
+    );
+  }
+
+  return (
+    <button
+      className={cn(baseStyles, variants[variant], className)}
+      {...props}
+      onClick={(event) => {
+        onTrack?.();
+        props.onClick?.(event);
+      }}
+    >
+      {content}
+    </button>
+  );
+};

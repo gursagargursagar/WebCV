@@ -1,0 +1,413 @@
+<div align="center">
+
+# Open Portfolio
+
+**An open source, self-hosted portfolio website builder.**
+Change any word, image or colour from an admin panel — no code, no redeploy,
+and your content stays in your own database.
+
+[![CI](https://github.com/ShadmanArafin/open_portfolio/actions/workflows/ci.yml/badge.svg)](https://github.com/ShadmanArafin/open_portfolio/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Next.js](https://img.shields.io/badge/Next.js-16-black)](https://nextjs.org)
+[![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
+
+**[getopenportfolio.vercel.app](https://getopenportfolio.vercel.app)** — the site, the docs,
+and a demo you can use in your browser without installing anything.
+
+[Deploy your own](#deploy-your-own) · [Run it locally](#run-it-locally) ·
+[Choose a backend](#choose-a-backend) · [Contributing](CONTRIBUTING.md) ·
+[Roadmap](#roadmap)
+
+</div>
+
+---
+
+Built for people who need a portfolio but should not have to learn a framework
+to keep one: students, designers, developers, photographers, writers.
+
+<img src="docs/images/public-site.png" alt="A photographer's home page: the name top left, a headline reading 'Pictures of places that are about to change', a supporting line, two buttons, and a row of three project cards below." width="100%">
+
+<p align="center"><em>The site a visitor sees — every band on it is a block its owner arranged, in one of the six themes, unmodified.</em></p>
+
+<img src="docs/images/page-builder.png" alt="The Pages screen in the admin. One page listed, marked Live with ten blocks, expanded to show its title, its address, a visibility control and the list of blocks." width="100%">
+
+<p align="center"><em>The same page in the editor. No code, no redeploy, and the address bar never leaves your own site.</em></p>
+
+> [!WARNING]
+> **Status: alpha (0.6).** The site, the editor and publishing all work, the
+> admin has real server-side authentication, and uploads are verified end to
+> end against both hosted object stores. The gaps are real and specific —
+> themes change the look but not the arrangement, the newsletter collects but
+> does not send, and one of the nine planned backends is not built. Read
+> [What does not work yet](#what-does-not-work-yet) before using this for
+> anything you depend on.
+
+## Deploy your own
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FShadmanArafin%2Fopen_portfolio&project-name=my-portfolio&repository-name=my-portfolio&env=OPB_SETUP_TOKEN&envDescription=Invent+any+long+phrase.+You+will+be+asked+for+it+once%2C+to+prove+the+site+is+yours.&envLink=https%3A%2F%2Fgithub.com%2FShadmanArafin%2Fopen_portfolio%23what-happens-on-first-run&stores=%5B%7B%22type%22%3A%22integration%22%2C%22integrationSlug%22%3A%22neon%22%2C%22productSlug%22%3A%22neon%22%2C%22protocol%22%3A%22storage%22%7D%2C%7B%22type%22%3A%22blob%22%2C%22access%22%3A%22public%22%7D%5D)
+
+Vercel copies this repository into your own GitHub account, provisions a free
+Neon Postgres database and a Blob store for your images, and asks you to invent
+one setup phrase. Then open your new site, claim it with that phrase, and answer
+four questions.
+
+No keys to find, nothing to install. The database connection string and the blob
+token are set for you and you never see either.
+
+> If the button ever stops provisioning them, deploy anyway and add **Neon** and
+> **Blob** from your project's Storage tab. The app uses whichever backend's
+> environment variables are present, so nothing else changes.
+
+### Before you use Vercel's free plan, read this
+
+Vercel's Hobby plan is **non-commercial only**, and their definition is broader
+than most people expect. From their
+[fair use guidelines](https://vercel.com/docs/limits/fair-use-guidelines)
+(checked 12 August 2026):
+
+> **Hobby teams** are restricted to non-commercial personal use only. All
+> commercial usage of the platform requires either a Pro or Enterprise plan.
+>
+> Commercial usage is defined as any Deployment that is used for the purpose of
+> financial gain of **anyone** involved in **any part of the production** of the
+> project […] Examples of this include, but are not limited to […] **Advertising
+> the sale of a product or service** […]
+>
+> Asking for Donations fall under commercial usage.
+
+A portfolio that exists to get you hired, or that lists services you charge for,
+may well fall inside that. A student's coursework portfolio almost certainly
+does not. We are not going to tell you which side of the line your site is on —
+that is Vercel's call, not ours, and their page says to
+[ask their support team](https://vercel.com/help#issues) if you are unsure.
+
+What we will say plainly: **if your portfolio advertises work you are paid for,
+budget for Vercel Pro or use one of the options below instead.** Running it on
+your own server has no such restriction, and neither does any host you pay for
+in the ordinary way.
+
+We have not checked whether Netlify's free tier carries an equivalent clause, so
+do not read its presence here as an endorsement of it for commercial sites.
+
+## Try it without installing anything
+
+The marketing site carries a demo of the admin and the published site that runs
+entirely in your browser — no account, no server, nothing saved. Seven
+professions and six themes, and it renders with the product's real blocks and
+themes rather than with screenshots.
+
+It is the admin, not a picture of it: build the page, add and delete blocks,
+reorder them, change the theme, publish, and open the result full size in its own
+tab. What is simulated is persistence, sign-in, uploads and email.
+
+For the full thing, with real saving, uploads and email:
+
+```bash
+docker compose -f docker-compose.demo.yml up
+```
+
+Every visitor gets their own copy of the site, in memory, thrown away after an
+hour — so the editor is fully usable and there is nothing to vandalise. Sign in
+with the details printed on the page.
+
+Uploading, sending email and saving service passwords are switched off, because
+a public sandbox that can do any of those becomes somebody else's file host or
+spam relay within a day of being noticed.
+
+## Run it on your own server
+
+One command, on any machine with Docker. No account anywhere, no platform that
+can change its terms, and nothing that phones home.
+
+```bash
+docker compose up
+```
+
+Open <http://localhost:3000> and follow the setup. That brings up the app and a
+Postgres database together; change `OPB_SETUP_TOKEN` and `OPB_SECRET_KEY` in
+`docker-compose.yml` first.
+
+Just the app, against a database you already have — from a released image, for
+amd64 or arm64, so nothing is built on your machine:
+
+```bash
+docker run -p 3000:3000 -v opb-data:/data \
+  -e OPB_POSTGRES_URL="postgres://…" \
+  -e OPB_SETUP_TOKEN="a long phrase you invent" \
+  -e OPB_SECRET_KEY="a different long phrase" \
+  ghcr.io/shadmanarafin/open_portfolio:latest
+```
+
+Use your own phrases: the two examples above are public, so a site still running
+on them refuses to be claimed. Each released image carries a signed record of the
+commit and workflow that built it, which you can check before running it:
+
+```bash
+gh attestation verify oci://ghcr.io/shadmanarafin/open_portfolio:latest --owner ShadmanArafin
+```
+
+Building it yourself instead is `docker build -t open-portfolio .` and the same
+`docker run` with `open-portfolio` as the image.
+
+**The volume matters.** `/data` is where uploads and — if you are not using a
+database — your content live. Without it, replacing the container deletes your
+site. With it, you can throw the container away and rebuild it as often as you
+like: that is exactly what updating does, and your content is untouched.
+
+## Run it locally
+
+**Requirements:** Node.js 22 or newer, and npm. Nothing else — no database is
+needed to try it, and no account anywhere.
+
+```bash
+git clone https://github.com/ShadmanArafin/open_portfolio.git
+cd open_portfolio
+npm ci
+npm run dev
+```
+
+Open <http://localhost:3000>. You will be sent to `/setup` to claim the site.
+Content is stored under `.opb/` — delete that folder to start over.
+
+## What happens on first run
+
+1. **Claim the site at `/setup`.** You give an email and a passphrase, and that
+   becomes the only account that can edit it. On a public host you also enter
+   your `OPB_SETUP_TOKEN`, which is what stops a stranger who finds the URL
+   before you from taking ownership.
+2. **Answer four questions.** Your name and what you do, the kind of work you
+   show, a colour, then publish. The second question renames sections to
+   language that fits your field — a photographer gets _Portfolio_ and _Brands
+   I've shot for_ where a developer gets _Projects_ and _Stack_. It changes
+   wording only, so nothing you have written can be lost by it.
+3. **You have a live site.** Demo projects stay as examples until you replace
+   them, and the dashboard lists whatever is still unfinished with a link to the
+   screen that fixes it.
+
+Every step is skippable. None of it is permanent.
+
+## Features
+
+### Build
+
+- **Writing.** Essays, notes, posts — called whatever fits what you do, built
+  from the same blocks as your pages, with RSS. Ordered the way you choose
+  rather than newest-first, so your best piece stays at the top instead of
+  sinking under last week's note. Scheduling works with nothing running.
+- **A mailing list, without a mailing-list account.** Switch on a sign-up box
+  and visitors can ask to hear from you. Everybody confirms by email before
+  they are on the list, leaving takes one press from the mail client itself,
+  and the list downloads as a CSV that Buttondown, Mailchimp and the rest
+  import directly. Nothing sends from here — the export is the exit, not a
+  lock-in.
+- **Seven starting points.** Design, Software, Photography, Writing, Research,
+  Student or something else — each one sets the wording, the theme and what your
+  writing section is called, and every part of it can be changed afterwards.
+- **Installable.** Add the editor to your phone's home screen and it opens like
+  an app.
+- **Six themes.** Editorial, Terminal, Gallery, Warm, Bold and Minimal — each
+  changes colour, typeface, spacing and corner radius together, and every one is
+  checked against the same contrast rules that block publishing. Pick one and
+  change anything you like on top; your changes always win.
+- **A visual page builder.** Add blocks, drag them into order, hide them, edit
+  every field. Twenty-seven block types. Twenty you fill in yourself - hero,
+  text, image, gallery, numbers, cards, a call to action, a contact form,
+  questions and answers, a video, a booking embed, a post from Instagram,
+  Behance or Substack, a picture beside text, a quote, a newsletter box,
+  comments, your social links, what you offer, a file to download, and space -
+  and seven that show what you have already entered:
+  your work, your writing, experience, clients, recommendations, what you do
+  and how you work. Those follow the records, so updating a project
+  updates every page showing it. Reordering is buttons in an outline rather
+  than dragging a canvas, so it works with a keyboard and on a phone.
+- **A contact form you can put anywhere**, not only at `/contact`. And a video
+  block that loads nothing from YouTube until a visitor presses play — most of
+  them never will, and that is half a megabyte and some third-party state you
+  did not agree to on their behalf.
+- **Any number of pages**, each at its own address, each with its own title and
+  description for search results. If you pick an address the site already uses,
+  it says so and suggests one that works instead of quietly 404ing later.
+- **Your home page too**, built the same way. Until you publish one, the theme's
+  own layout keeps rendering, so nothing changes until you decide it should.
+- **A media library.** Pick a picture you have already uploaded rather than
+  uploading it twice — and write its description at the moment you choose it,
+  which is the only point anybody actually does.
+- **Advice while you type.** A headline that will wrap to four lines on a phone,
+  a gallery of one, an image with no alt text, one card stranded on the last
+  row. Advice, never a refusal.
+
+### Publish
+
+- **Draft and publish.** Each screen saves to a draft when you press Save (or
+  Cmd/Ctrl+S), and asks before you leave with changes unsaved. The live site keeps
+  showing the published version until you publish.
+- **Preview before anyone else sees it**, at the page's real address, with a
+  banner so you never mistake a draft for the live site.
+- **Version history.** Every publish snapshots the content and any version can be
+  restored. Capped at 20 so storage stays flat.
+- **Colour contrast is checked before publishing.** A palette nobody could read
+  is refused, not warned about.
+- **A dashboard that tells you what is missing** — a run of checks over the
+  published content, each linking to the screen that fixes it.
+
+### Run
+
+- **Real SEO.** Every page is server-rendered with its own title, description,
+  Open Graph and Twitter tags. `sitemap.xml` and `robots.txt` come from your
+  content.
+- **A contact form that works.** Messages land in an inbox inside the admin, and
+  email you when they arrive.
+- **Connect services from the admin.** A mail server, without an environment
+  variable or a redeploy — press Test and it tells you what is wrong in words
+  you can act on. Passwords are encrypted and never sent back to the browser.
+- **Ask for things without leaving the admin.** Report a bug or request a
+  feature: it checks whether somebody already said it — or whether it is already
+  fixed in a newer version — attaches your version and setup, and files it under
+  your own GitHub account so you are credited when it lands.
+- **Your data, your database.** Pick a backend or let the deploy button provide
+  one. Export everything as a single JSON file at any time.
+- **Updates never touch your content.** It lives in your database; an update
+  only changes code. See [docs/UPDATING.md](docs/UPDATING.md).
+
+## Choose a backend
+
+| Backend                 | Free tier                 | Works on Vercel/Netlify | Best for                                                           |
+| ----------------------- | ------------------------- | ----------------------- | ------------------------------------------------------------------ |
+| **Local filesystem**    | free forever, no account  | no                      | trying it out, a VPS, Docker, a Raspberry Pi                       |
+| **Supabase**            | 500MB database, 1GB files | yes                     | one account for everything; free projects pause after ~1 week idle |
+| **Neon + Vercel Blob**  | 0.5GB database, 1GB blob  | yes                     | deploying on Vercel; resumes instantly after idling                |
+| **Postgres (any host)** | depends on your host      | no                      | Railway, Render, Fly, Coolify, or a database you already run       |
+| **PocketBase**          | free forever, self-hosted | no                      | one binary for database + files on your own server                 |
+| **Firebase**            | Spark plan free           | no                      | Firestore + Storage when you already live in Google's console      |
+| **Appwrite**            | free, self-hosted/Cloud   | no                      | documents + files with a full console when you want one            |
+| **Cloudflare D1+R2**    | free, local engine        | no                      | D1 SQLite + R2 objects on your own server, no account              |
+
+You do not choose in advance. Whichever service's environment variables are
+present is the one that gets used, so provisioning a database is the only step.
+See [.env.example](.env.example).
+
+Adding another backend is one file implementing `StorageAdapter`, one line in the
+registry, and a green run of the conformance suite — ~50 assertions covering
+round-tripping, concurrent writes, expiry, namespace isolation, passkey
+storage, and the rule that auth state never travels inside a content export.
+
+## What does not work yet
+
+Being direct about this, because the gaps are structural and you should not
+discover them after typing in a portfolio:
+
+- **Email is optional; without it there is no notification.**
+  Enquiries always reach your inbox inside the admin. Configure SMTP (see
+  [.env.example](.env.example)) and the owner is also emailed when one
+  arrives, and a forgotten passphrase can be reset from `/admin/login` instead
+  of deleting the owner record. Emailed one-time codes also work as a sign-in
+  method.
+- ~~Uploads unverified on the hosted stores.~~ **Both are now verified**, each
+  end to end: upload through the admin, then an anonymous fetch of the result.
+  Supabase cost two real bugs that would have broken every Supabase deployment
+  after its first boot; Vercel Blob passed 48/48 first time.
+- **Your home page starts as the theme's fixed layout.** Not a gap any more —
+  building it from blocks under Pages starts from what it shows today, section
+  by section, and takes over the moment you publish. Until you do, nothing
+  about your site changes. The old layout is still edited on its own screen,
+  which is the part that has not been merged away.
+- **Six themes, but they are colour, type and spacing only.** Each one changes
+  the palette, the typeface, how tight the layout is and how round the corners
+  are — not the arrangement of the page. Blocks that show your records adapt to
+  what you have, so a page is less fixed than it was, but a theme still cannot
+  rearrange it.
+- **The admin works on a phone, but was designed on a desktop.** It installs
+  to a home screen, its navigation is a phone-sized menu, and every target was
+  measured at 375px — but long editing screens are still easier on a wide one.
+  New enquiries can buzz your devices: see
+  [push notifications](docs/PUSH-NOTIFICATIONS.md).
+- **Sign-in is an email and a passphrase — plus passkeys and emailed one-time codes.** Passkeys enroll in Settings; all three methods are offered on the sign-in page.
+- **The newsletter collects addresses; it does not send.** Sign-up, double
+  opt-in and export all work. Actually mailing your list means deliverability,
+  bounce handling and list hygiene — a different product with different
+  obligations — so the export is deliberately the exit: a CSV in the shape
+  Buttondown, Mailchimp and the rest import. Sign-ups also need SMTP
+  configured, because confirming means sending somebody a link.
+- **One of the nine planned backends is not built.** Convex, which needs an
+  account rather than an emulator and is therefore blocked on signup, not code.
+  The eight that exist are the eight the README offers.
+
+## Tech stack
+
+- **[Next.js 16](https://nextjs.org)** (App Router) + **React 19** + **TypeScript**
+- **Tailwind CSS** for the public site, with colour and typography driven by CSS
+  variables the editor writes at runtime
+- **Pluggable storage** behind a `StorageAdapter` interface — local filesystem,
+  Supabase, Neon + Vercel Blob, any Postgres, PocketBase, Firebase, Appwrite or
+  Cloudflare D1 + R2
+- **scrypt + httpOnly session cookies** for admin authentication
+- **Vitest**, including a storage conformance suite run against a real Postgres
+  in CI
+
+## Roadmap
+
+| Version       | What lands                                                                       |
+| ------------- | -------------------------------------------------------------------------------- |
+| 0.1           | Open-source groundwork: MIT licence, no personal data, lint and CI               |
+| 0.2           | Next.js App Router, server rendering, SEO, Open Graph, sitemap, real 404         |
+| 0.3           | Server-side auth, publishing that reaches visitors, a contact form that delivers |
+| 0.4           | Pluggable storage with a conformance suite every backend must pass               |
+| 0.5           | Page builder, six themes, writing, presets, newsletter sign-ups, Docker          |
+| **0.6 (now)** | Server-rendered admin, eight backends, passkeys, CSV, backups, released images   |
+| Next          | The open backlog in [PROJECT-REVIEW.md](docs/PROJECT-REVIEW.md)                  |
+| 1.0           | Stable                                                                           |
+
+### Documentation
+
+Both sets are published at
+**[getopenportfolio.vercel.app](https://getopenportfolio.vercel.app)** —
+[help centre](https://getopenportfolio.vercel.app/help) and
+[developer docs](https://getopenportfolio.vercel.app/docs).
+
+They are written for two different people, and live in [site/](site/) — a
+separate application in this repository that builds to a static export. It is
+not part of what you deploy.
+
+- **Help centre** (`site/content/help/`) — for anyone with a portfolio to run.
+  Never shows a terminal command; where a task needs one it links across.
+- **Developer docs** (`site/content/docs/`) — self-hosting, every environment
+  variable, the storage adapter contract, the block system, the theme tokens,
+  and why it is built the way it is.
+
+Both are plain Markdown with four lines of frontmatter, and the navigation,
+search and sitemap are generated from the files. `cd site && npm install &&
+npm run dev` to read them locally.
+
+What changed in each release, and who asked for it, is in
+**[CHANGELOG.md](CHANGELOG.md)**. Detailed status for every phase, including
+what is verified and what is not, is in **[docs/PLAN.md](docs/PLAN.md)**. If you
+are picking this project up to work on it, start with
+**[docs/HANDOVER.md](docs/HANDOVER.md)**.
+
+**Ask for something.** Open **Help & feedback** in your own admin: it checks
+whether somebody already reported it — or whether it is already fixed in a
+newer version — fills in your version and setup, and sends it under your own
+GitHub account so you are credited when it lands.
+
+## Contributing
+
+Contributions are welcome — especially bug reports from actually using the admin,
+accessibility fixes, and interface copy that stops assuming the user is a
+designer.
+
+Two rules worth reading before you start: **no personal or client content in the
+repository** (demo content must be fictional, yours, or CC0), and **no secrets in
+the client bundle**.
+
+- **[CONTRIBUTING.md](CONTRIBUTING.md)** — setup, conventions, DCO sign-off
+- **[docs/PLAN.md](docs/PLAN.md)** — architecture, phase status, handoff notes
+- **[ADMIN_SETUP.md](ADMIN_SETUP.md)** — using the editor
+- **[CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)**
+- **[SECURITY.md](SECURITY.md)** — report vulnerabilities privately, never as an issue
+
+## Licence
+
+[MIT](LICENSE). Use it, fork it, sell what you build with it.
+
+Demo assets in `public/demo/` are CC0 and depict invented companies — see
+[public/demo/LICENSE.md](public/demo/LICENSE.md).

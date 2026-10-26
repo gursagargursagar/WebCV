@@ -1,0 +1,55 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    # Grouped so a normal week is one reviewable PR rather than fifteen.
+    groups:
+      dev-tooling:
+        patterns:
+          - eslint*
+          - '@eslint/*'
+          - typescript-eslint
+          - prettier
+          - vite
+          - '@vitejs/*'
+          - typescript
+      react:
+        patterns:
+          - react
+          - react-dom
+          - '@types/react*'
+      production:
+        dependency-type: production
+
+    ignore:
+      # Tailwind 4 is a migration, not a bump, and it is tracked as an issue
+      # rather than as a permanently-red pull request. v4 moves the PostCSS
+      # plugin, drops the `@tailwind` directives, and stops reading
+      # tailwind.config.js — so every `bg-bg` and `text-text-primary` in this
+      # codebase would compile to nothing. Nothing here would catch that: no
+      # test looks at the built CSS, and missing utilities do not fail a build.
+      #
+      # Without this rule Dependabot reopens the same PR on every v4 release
+      # and the reasoning has to be written again each time.
+      - dependency-name: tailwindcss
+        update-types: ['version-update:semver-major']
+
+      # ESLint 10 and TypeScript 7 are pinned out, not merely deferred. There
+      # is no eslint-plugin-jsx-a11y compatible with ESLint 10, and TypeScript
+      # 7 falls outside typescript-eslint's peer range. The group bump was
+      # merged once and reverted in 518752b; it has been proposed and refused
+      # twice since. Remove these when upstream catches up.
+      - dependency-name: eslint
+        update-types: ['version-update:semver-major']
+      - dependency-name: '@eslint/js'
+        update-types: ['version-update:semver-major']
+      - dependency-name: typescript
+        update-types: ['version-update:semver-major']
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly

@@ -1,0 +1,17 @@
+dist
+node_modules
+coverage
+package-lock.json
+public/demo
+.next
+next-env.d.ts
+.opb
+.superpowers
+site/node_modules
+site/.next
+site/out
+
+# Shell scripts. Prettier has no parser for them.
+*.sh
+.vercel
+site/.vercel

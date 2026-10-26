@@ -1,0 +1,192 @@
+'use client';
+
+import React, { useState, useEffect } from 'react';
+import { ThemeToggle } from './common/ThemeToggle';
+import { ArrowUpRight, Menu, X } from 'lucide-react';
+import { Container } from './common/Container';
+import { cn } from '../utils/cn';
+import { useCMS } from '../cms/context/use-cms';
+import { mergeNavLinks } from '@/core/pages/nav';
+
+import Link from '@/core/site/link';
+import { useSitePathname } from '@/core/site/link';
+/**
+ * The navbar with its current-page highlight. `usePathname()` suspends while
+ * a route's address is not yet known (a share link, a tag archive), so the
+ * layout renders this inside Suspense with `NavbarFrame` as its fallback: the
+ * same bar without the highlight, so nothing moves when the address arrives.
+ */
+export const Navbar: React.FC = () => <NavbarFrame pathname={useSitePathname()} />;
+
+export const NavbarFrame: React.FC<{ pathname: string | null }> = ({ pathname }) => {
+  const { data } = useCMS();
+  const [scrolled, setScrolled] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const menuButtonRef = React.useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 120) {
+        setScrolled(true);
+      } else {
+        setScrolled(false);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // A navigation closes the menu. Adjusted while rendering (React's pattern for
+  // state that follows a prop) rather than in an effect, which would paint the
+  // new page with the menu still open for a frame.
+  const [menuPath, setMenuPath] = useState(pathname);
+  if (pathname !== menuPath) {
+    setMenuPath(pathname);
+    setMobileMenuOpen(false);
+  }
+
+  // The overlay is a dialog: Escape closes it and focus returns to the
+  // hamburger that opened it, so keyboard users never lose their place.
+  useEffect(() => {
+    if (!mobileMenuOpen) return;
+    const menuButton = menuButtonRef.current;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setMobileMenuOpen(false);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => {
+      window.removeEventListener('keydown', onKey);
+      menuButton?.focus();
+    };
+  }, [mobileMenuOpen]);
+
+  // Pages the owner marked "show in navigation" appear here alongside the
+  // links set in Settings, so building a page is enough to make it reachable.
+  const navLinks = mergeNavLinks(data.navLinks, data.pages);
+
+  // The wordmark is the owner's name from Settings. The narrow variant drops to
+  // the first word so a long name doesn't collide with the nav on small phones.
+  const fullName = data.settings.fullName?.trim() || 'Portfolio';
+  const shortName = fullName.split(/\s+/)[0];
+
+  return (
+    <>
+      <header
+        className={cn(
+          'fixed top-0 left-0 right-0 z-50 transition-all duration-300 ease-out',
+          scrolled
+            ? 'py-4 bg-bg/90 border-b border-border backdrop-blur-md shadow-sm'
+            : 'py-6 sm:py-8 bg-transparent'
+        )}
+      >
+        <Container>
+          {/* Robust 3-Column Grid Layout: 1fr auto 1fr (Left | Truly Centered Menu | Right) */}
+          <div className="grid grid-cols-2 md:grid-cols-[1fr_auto_1fr] items-center w-full gap-4">
+            {/* LEFT: Clean Text Logo */}
+            <div className="justify-self-start">
+              <Link
+                href="/"
+                className="font-display font-medium text-base sm:text-lg tracking-tight text-text-primary group"
+              >
+                <span className="hidden xs:inline-block uppercase tracking-wider">{fullName}</span>
+                <span className="xs:hidden uppercase tracking-wider">{shortName}</span>
+              </Link>
+            </div>
+
+            {/* CENTER: Desktop Nav Links Truly Centered in Viewport */}
+            <nav className="hidden md:flex items-center justify-center gap-7 lg:gap-8 justify-self-center">
+              {navLinks.map((link) => {
+                const isActive = pathname === link.path;
+                return (
+                  <Link
+                    key={link.id}
+                    href={link.path}
+                    className={cn(
+                      'relative font-body text-sm sm:text-[15px] font-medium transition-colors duration-200 py-1 group',
+                      isActive ? 'text-text-primary' : 'text-text-secondary hover:text-text-primary'
+                    )}
+                  >
+                    {link.label}
+                    <span
+                      className={cn(
+                        'absolute bottom-0 left-0 w-full h-[1.5px] bg-accent origin-left transition-transform duration-300 ease-out',
+                        isActive ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'
+                      )}
+                    />
+                  </Link>
+                );
+              })}
+            </nav>
+
+            {/* RIGHT: Theme Toggle & Let's Talk CTA (Strict 42px Height & Raleway 500) */}
+            <div className="hidden lg:flex items-center gap-3.5 justify-self-end">
+              <ThemeToggle />
+
+              <Link
+                href="/contact"
+                aria-label={`Let's talk with ${fullName}`}
+                className="inline-flex items-center justify-center gap-2 h-[42px] px-5 sm:px-6 rounded-full text-xs sm:text-[13px] font-medium uppercase tracking-wider font-body bg-text-primary text-bg hover:opacity-90 transition-all duration-250 hover:-translate-y-[1px] group cursor-pointer select-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none"
+              >
+                <span>LET'S TALK</span>
+                <ArrowUpRight className="w-4 h-4 transition-transform duration-250 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 flex-shrink-0" />
+              </Link>
+            </div>
+
+            {/* MOBILE CONTROLS */}
+            <div className="flex lg:hidden items-center justify-end gap-3 justify-self-end">
+              <ThemeToggle showText={false} />
+              <button
+                ref={menuButtonRef}
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                className="w-[42px] h-[42px] rounded-full border border-border text-text-primary flex items-center justify-center cursor-pointer hover:border-text-primary/40 transition-colors"
+                aria-label={mobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
+                aria-expanded={mobileMenuOpen}
+                aria-controls="mobile-menu"
+              >
+                {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              </button>
+            </div>
+          </div>
+        </Container>
+      </header>
+
+      {/* MOBILE OVERLAY MENU */}
+      <>
+        {mobileMenuOpen && (
+          <div
+            id="mobile-menu"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Site menu"
+            className="opb-pop fixed inset-0 z-40 bg-bg pt-28 px-8 pb-12 flex flex-col justify-between lg:hidden"
+          >
+            <nav className="flex flex-col gap-6">
+              {navLinks.map((link) => (
+                <Link
+                  key={link.id}
+                  href={link.path}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="font-display text-2xl sm:text-3xl font-medium text-text-primary hover:text-accent transition-colors"
+                >
+                  {link.label}
+                </Link>
+              ))}
+            </nav>
+
+            <div className="pt-8 border-t border-border flex flex-col gap-4">
+              <ThemeToggle className="w-full justify-center" />
+              <Link
+                href="/contact"
+                onClick={() => setMobileMenuOpen(false)}
+                className="w-full h-[42px] rounded-full inline-flex items-center justify-center font-medium uppercase tracking-wider font-body text-xs sm:text-[13px] bg-text-primary text-bg"
+              >
+                LET'S TALK ↗
+              </Link>
+            </div>
+          </div>
+        )}
+      </>
+    </>
+  );
+};
