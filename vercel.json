@@ -1,0 +1,9 @@
+{
+  "trailingSlash": true,
+  "redirects": [
+    { "source": "/", "destination": "/gursagar24/", "permanent": false }
+  ],
+  "headers": [
+    { "source": "/gursagar24/img/(.*)", "headers": [ { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" } ] }
+  ]
+}
