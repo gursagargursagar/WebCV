@@ -3,16 +3,16 @@ import './platform.css';
 import { Foot, TopBar } from './chrome';
 
 export const metadata: Metadata = {
-  title: { absolute: 'WebCV — your portfolio at webcv.au/you' },
+  title: { absolute: 'WebCV — a free portfolio at webcv.au/you' },
   description:
-    'Build a portfolio website in minutes. Pick your address, fill it in with a visual editor, and share webcv.au/your-name.',
+    'A portfolio at webcv.au/you, live in minutes, for free ($0). Pick a template, edit it right on the page, and share webcv.au/your-name.',
   robots: { index: true, follow: true },
   // The root layout fills these from a portfolio's content; the platform is not one.
   applicationName: 'WebCV',
   authors: [{ name: 'WebCV' }],
   openGraph: {
-    title: 'WebCV — your portfolio at webcv.au/you',
-    description: 'Build a portfolio website in minutes and share webcv.au/your-name.',
+    title: 'WebCV — a free portfolio at webcv.au/you',
+    description: 'A portfolio at webcv.au/you, live in minutes, for free ($0).',
     url: 'https://www.webcv.au',
     siteName: 'WebCV',
     type: 'website',
@@ -20,8 +20,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'WebCV — your portfolio at webcv.au/you',
-    description: 'Build a portfolio website in minutes and share webcv.au/your-name.',
+    title: 'WebCV — a free portfolio at webcv.au/you',
+    description: 'A portfolio at webcv.au/you, live in minutes, for free ($0).',
     images: [],
   },
 };

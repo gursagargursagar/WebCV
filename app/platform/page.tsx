@@ -87,7 +87,7 @@ export default async function PlatformHome() {
             </p>
             <h1 id="hero-title">
               Your work, one link.
-              <span className="wc-hero-subline">A portfolio at webcv.au/you, live in minutes.</span>
+              <span className="wc-hero-subline">A portfolio at webcv.au/you, live in minutes, for free ($0).</span>
             </h1>
             <p className="wc-hero-lede">
               Pick your address, fill in your projects and experience in a visual editor, and publish.
