@@ -85,5 +85,7 @@ export interface StudioMeta {
    * search engines do not read sample headlines as the host's own.
    */
   decorative?: boolean;
+  /** An approved statutory declaration: a link to it in the footer. */
+  declared?: { href: string; label: string };
   edit?: StudioEditHooks;
 }

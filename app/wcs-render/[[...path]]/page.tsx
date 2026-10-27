@@ -7,6 +7,7 @@ import { metaFor, pageAt, studioMetadata } from '@/core/studio/serve';
 import { readStudio } from '@/core/studio/store';
 import { looksLikeStarter } from '@/core/studio/starters';
 import { JsonLd } from '@/core/content/json-ld-script';
+import { declaredLink } from '@/core/declarations/badge';
 import type { StudioPage, StudioSite } from '@/core/studio/types';
 
 /**
@@ -85,12 +86,16 @@ export default async function StudioPublicPage({ params }: Params) {
   const found = await load((await params).path);
   if (!found) notFound();
   const { site, studio, page } = found;
+  const declared = await declaredLink(site);
   return (
     <>
       <JsonLd data={portfolioJsonLd(site, studio, page)} />
       <StudioPageView
         data={page.data}
-        meta={metaFor(studio, page, `/${site}`, `/${site}/api/contact`)}
+        meta={{
+          ...metaFor(studio, page, `/${site}`, `/${site}/api/contact`),
+          declared: declared ?? undefined,
+        }}
       />
     </>
   );

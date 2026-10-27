@@ -34,6 +34,8 @@ export const RESERVED_TOP_LEVEL: readonly string[] = [
   'platform',
   // Where a published Studio page renders (see proxy.ts).
   'wcs-render',
+  // A portfolio's statutory declaration page (see proxy.ts).
+  'wcs-declaration',
   'case-studies',
   'contact',
   'cv',

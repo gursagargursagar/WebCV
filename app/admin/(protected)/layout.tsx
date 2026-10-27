@@ -13,6 +13,7 @@ import { AssistProvider } from './_components/assist';
 import { assistCapabilities } from '@/core/ai/assist';
 import { currentSite } from '@/core/site/tenant';
 import { isMultiSite } from '@/core/site/constants';
+import { isOperatorEmail } from '@/core/declarations/service';
 import { getStorageAdapter } from '@/core/storage/registry';
 import { hasUnpublishedChanges } from '@/core/content/changes';
 import { Brand } from '@/components/scai/Brand';
@@ -80,8 +81,14 @@ export default async function ProtectedAdminLayout({ children }: { children: Rea
   // WebCV hides the screens about running the platform itself (which database,
   // the upstream project's GitHub support): an owner can do nothing there.
   const PLATFORM_ONLY = new Set(['/admin/storage', '/admin/help']);
+  // Declarations live in WebCV's shared database; reviewing them is for operators.
+  const WEBCV_ONLY = new Set(['/admin/declaration', '/admin/declaration-reviews']);
+  const operator = isMultiSite() && isOperatorEmail(session.email);
   const listed = withLegacyCaseStudies((draft.caseStudies ?? []).length > 0).filter(
-    (section) => !(isMultiSite() && PLATFORM_ONLY.has(section.href))
+    (section) =>
+      !(isMultiSite() && PLATFORM_ONLY.has(section.href)) &&
+      !(!isMultiSite() && WEBCV_ONLY.has(section.href)) &&
+      !(section.href === '/admin/declaration-reviews' && !operator)
   );
   // WebCV builds the site in the Studio; the classic editors move under Advanced.
   const sections = isMultiSite() ? withAdvanced(listed) : listed;

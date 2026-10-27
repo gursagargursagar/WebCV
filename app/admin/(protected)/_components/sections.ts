@@ -40,6 +40,7 @@ export const ADMIN_SECTIONS: AdminSection[] = [
   { href: '/admin/capabilities', label: 'Capabilities', group: 'Profile' },
   { href: '/admin/process', label: 'Process', group: 'Profile' },
   { href: '/admin/artifacts', label: 'Artifacts', group: 'Profile' },
+  { href: '/admin/declaration', label: 'Statutory declaration', group: 'Profile' },
   { href: '/admin/messages', label: 'Messages', group: 'Audience' },
   { href: '/admin/newsletter', label: 'Newsletter', group: 'Audience' },
   { href: '/admin/analytics', label: 'Analytics', group: 'Audience' },
@@ -51,6 +52,7 @@ export const ADMIN_SECTIONS: AdminSection[] = [
   { href: '/admin/storage', label: 'Storage', group: 'System' },
   { href: '/admin/your-site', label: 'Your site', group: 'System' },
   { href: '/admin/history', label: 'History', group: 'System' },
+  { href: '/admin/declaration-reviews', label: 'Declaration reviews', group: 'System' },
   { href: '/admin/help', label: 'Help', group: 'System' },
 ];
 
@@ -73,6 +75,8 @@ const EVERYDAY = new Set([
   '/admin/media',
   '/admin/settings',
   '/admin/your-site',
+  '/admin/declaration',
+  '/admin/declaration-reviews',
 ]);
 
 export function withAdvanced(sections: AdminSection[]): AdminSection[] {

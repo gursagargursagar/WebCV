@@ -773,6 +773,13 @@
   text-decoration: none;
 }
 
+/* A statutory declaration on file: a plain link, never a tick or a seal. */
+.wcs-declared {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
 .wcs-made:hover {
   text-decoration: underline;
 }

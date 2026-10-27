@@ -914,6 +914,11 @@ function SiteFrame({ children, puck }: { children: ReactNode; puck: Puck }) {
         <span>
           © {new Date().getFullYear()} {design.siteName}
         </span>
+        {meta.declared && !edit ? (
+          <a href={meta.declared.href} className="wcs-declared">
+            {meta.declared.label}
+          </a>
+        ) : null}
         <a href="https://www.webcv.au" className="wcs-made">
           Made with WebCV
         </a>

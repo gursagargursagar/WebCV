@@ -4,6 +4,7 @@ import { siteNow } from '@/core/content/now';
 import { currentChannel } from '@/core/pages/read';
 import { Navbar, NavbarFrame } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
+import { DeclaredBadge } from '@/core/declarations/declared-badge';
 import { SideSectionIndicator } from '@/components/common/SideSectionIndicator';
 import { SiteProviders } from './providers';
 import { currentSite } from '@/core/site/tenant';
@@ -59,6 +60,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
           <ViewTransition>{children}</ViewTransition>
         </main>
         <Footer />
+        {isMultiSite() ? <DeclaredBadge site={await currentSite()} /> : null}
       </div>
     </SiteProviders>
   );

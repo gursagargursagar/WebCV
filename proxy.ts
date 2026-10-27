@@ -93,6 +93,10 @@ async function routeMultiSite(req: NextRequest): Promise<NextResponse | 'admin' 
       });
       return res;
     }
+    // The portfolio's statutory declaration, whichever editor built the site.
+    if (rest === '/declaration' || rest === '/declaration/') {
+      return rewrite('/wcs-declaration', first);
+    }
     // A portfolio built in the Studio: its pages are served by the Studio's
     // route, and anything it has no page for (the contact API, the classic
     // sections) still reaches the ordinary routes.

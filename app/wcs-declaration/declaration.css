@@ -1,0 +1,62 @@
+/* The public declaration page: one quiet column on the site's own tokens. */
+.wcd {
+  width: min(720px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 56px 0 64px;
+  color: var(--text-primary);
+  line-height: 1.65;
+}
+.wcd p {
+  margin: 0;
+}
+.wcd h1 {
+  margin: 8px 0 0;
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 5vw, 3rem);
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+}
+.wcd-eyebrow {
+  color: var(--text-muted);
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.wcd-lede {
+  margin-top: 18px !important;
+  color: var(--text-secondary);
+}
+.wcd-list {
+  display: grid;
+  gap: 12px;
+  margin: 28px 0 0;
+  padding-left: 1.4em;
+  list-style: decimal;
+}
+.wcd-lapsed {
+  color: var(--text-muted);
+}
+.wcd-note {
+  font-size: 0.92em;
+}
+.wcd-notice {
+  display: grid;
+  gap: 10px;
+  margin-top: 32px;
+  padding: 18px 20px;
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  background: var(--surface-secondary);
+  color: var(--text-secondary);
+  font-size: 0.94rem;
+}
+.wcd-foot {
+  margin-top: 28px !important;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+.wcd a {
+  color: inherit;
+  text-underline-offset: 3px;
+}

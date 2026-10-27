@@ -38,7 +38,8 @@ const PUBLIC_ROUTES: Record<string, string> = {
   'setup/claim': 'Runs before an owner exists. Guarded by the setup token and a one-time lock.',
   'platform/signup':
     'WebCV sign-up: creates a new portfolio and its owner. There is no owner yet to check; rate limited.',
-  'platform/check': 'WebCV sign-up: whether an address is free. Reveals only that a public URL exists.',
+  'platform/check':
+    'WebCV sign-up: whether an address is free. Reveals only that a public URL exists.',
   contact: 'The contact form. Visitors are the entire point.',
   'newsletter/subscribe': 'The sign-up form. A visitor asking to hear from the owner.',
   'newsletter/confirm':
@@ -55,6 +56,8 @@ const PUBLIC_ROUTES: Record<string, string> = {
     'The Turnstile site key, which is public by design. Reveals nothing; without it the widget cannot render at all.',
   'cron/digest':
     'Called by a scheduler with nobody signed in. Authorised by the CRON_SECRET shared secret, compared in constant time, and refuses everything until one is set.',
+  'admin/declaration/return':
+    "Where Stripe sends the owner back to: a cross-site arrival the same-origin check would refuse. It only reads Stripe's record of a payment for the signed-in owner's own declaration (getOwnerSession), then hands over to the guarded admin.",
   'preview/end':
     'Turning your own preview off grants nothing. Requiring a session here would strand someone in preview when it expired.',
 };
