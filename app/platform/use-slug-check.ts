@@ -13,14 +13,7 @@ export function normaliseSlug(value: string): string {
 }
 
 type CheckState =
-  | 'idle'
-  | 'short'
-  | 'checking'
-  | 'free'
-  | 'taken'
-  | 'invalid'
-  | 'unavailable'
-  | 'error';
+  'idle' | 'short' | 'checking' | 'free' | 'taken' | 'invalid' | 'unavailable' | 'error';
 
 /**
  * Live "is webcv.au/<slug> free", debounced, as the visitor types.
@@ -28,7 +21,8 @@ type CheckState =
  * Every state says what to do next rather than only what is wrong, and a
  * failure to check never blocks: the server checks again on submit.
  */
-export function useSlugCheck(slug: string) {
+/** `claim` opens an address held for someone (core/site/claims.ts). */
+export function useSlugCheck(slug: string, claim = '') {
   const [state, setState] = useState<CheckState>('idle');
   const [reason, setReason] = useState('');
 
@@ -45,7 +39,8 @@ export function useSlugCheck(slug: string) {
     const controller = new AbortController();
     const timer = setTimeout(async () => {
       try {
-        const res = await fetch(`/api/platform/check?slug=${encodeURIComponent(slug)}`, {
+        const query = `slug=${encodeURIComponent(slug)}${claim ? `&claim=${encodeURIComponent(claim)}` : ''}`;
+        const res = await fetch(`/api/platform/check?${query}`, {
           signal: controller.signal,
         });
         const data = (await res.json().catch(() => ({}))) as {
@@ -71,7 +66,7 @@ export function useSlugCheck(slug: string) {
       clearTimeout(timer);
       controller.abort();
     };
-  }, [slug]);
+  }, [slug, claim]);
 
   const message = {
     idle: 'Lowercase letters, numbers and hyphens.',

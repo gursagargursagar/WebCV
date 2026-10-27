@@ -32,7 +32,6 @@ async function platformSitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'monthly' as const,
       priority: 0.7,
     })),
-    { url: `${origin}/gursagar24`, lastModified: now, changeFrequency: 'monthly', priority: 0.5 },
   ];
 
   let sites: Awaited<ReturnType<typeof publishedSites>> = [];
@@ -65,7 +64,21 @@ async function platformSitemap(): Promise<MetadataRoute.Sitemap> {
     return [];
   });
 
-  return [...platform, ...portfolios];
+  // Gursagar's hand-built page is listed until its Studio version takes over.
+  const legacy: MetadataRoute.Sitemap = sites.some(
+    (site) => site.slug === 'gursagar24' && site.studioSlugs
+  )
+    ? []
+    : [
+        {
+          url: `${origin}/gursagar24`,
+          lastModified: now,
+          changeFrequency: 'monthly',
+          priority: 0.5,
+        },
+      ];
+
+  return [...platform, ...legacy, ...portfolios];
 }
 
 /** One portfolio built in the Studio: its pages, under its own address. */

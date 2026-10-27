@@ -1,0 +1,1325 @@
+{
+  "design": {
+    "template": "swiss",
+    "mode": "light",
+    "accent": "#0b6bcb",
+    "fonts": "grotesk",
+    "siteName": "Gursagar S. Virdi",
+    "tagline": "Mechanical design engineer"
+  },
+  "pages": [
+    {
+      "title": "Work",
+      "slug": "",
+      "inNav": true,
+      "blocks": [
+        {
+          "type": "Hero",
+          "props": {
+            "heading": "Hi, I'm Guru",
+            "text": "Thanks for dropping by, have a squiz at what I’ve been building with a fair bit of heart and hustle..",
+            "size": "m",
+            "align": "left"
+          }
+        },
+        {
+          "type": "Projects",
+          "props": {
+            "heading": "",
+            "columns": "auto",
+            "shape": "auto",
+            "captions": "below"
+          }
+        }
+      ]
+    },
+    {
+      "title": "Internship + ECA",
+      "slug": "internship",
+      "inNav": true,
+      "blocks": [
+        {
+          "type": "Hero",
+          "props": {
+            "heading": "Passion before paychecks...",
+            "text": "",
+            "size": "s",
+            "align": "left"
+          }
+        },
+        {
+          "type": "Split",
+          "props": {
+            "src": "/gursagar24/img/f9accbc6-e711-4462-8936-8a1c27e2682c.jpg",
+            "alt": "Hero MotoCorp",
+            "heading": "Hero MotoCorp",
+            "text": "6 Months paid industry Internship · 2018",
+            "side": "left"
+          }
+        },
+        {
+          "type": "Button",
+          "props": {
+            "label": "Read about Hero MotoCorp",
+            "href": "/hero-motocorp",
+            "variant": "outline",
+            "align": "left"
+          }
+        },
+        {
+          "type": "Split",
+          "props": {
+            "src": "/gursagar24/img/ae6999a2-9515-4aa9-ae66-5918757d3611.jpg",
+            "alt": "Fateh Motorsports",
+            "heading": "Fateh Motorsports",
+            "text": "Automotive Society of TIET · 2017",
+            "side": "left"
+          }
+        },
+        {
+          "type": "Button",
+          "props": {
+            "label": "Read about Fateh Motorsports",
+            "href": "/fateh-motorsports",
+            "variant": "outline",
+            "align": "left"
+          }
+        }
+      ]
+    },
+    {
+      "title": "Patents",
+      "slug": "patents",
+      "inNav": true,
+      "blocks": [
+        {
+          "type": "Heading",
+          "props": {
+            "text": "Patents",
+            "size": "l",
+            "align": "left"
+          }
+        },
+        {
+          "type": "PhotoGrid",
+          "props": {
+            "images": [
+              {
+                "src": "/gursagar24/img/e4304265-e05b-46d2-a7c4-66d1fc772713.jpg",
+                "alt": "Patents — image 1"
+              },
+              {
+                "src": "/gursagar24/img/673b8ac7-42a0-4eb9-b33a-2aebbb8ec287.jpg",
+                "alt": "Patents — image 2"
+              },
+              {
+                "src": "/gursagar24/img/688b6495-8b67-491b-bdcf-e582a296f960.jpg",
+                "alt": "Patents — image 3"
+              }
+            ],
+            "columns": "3",
+            "gap": "small"
+          }
+        },
+        {
+          "type": "Button",
+          "props": {
+            "label": "See Patent",
+            "href": "https://patentscope.wipo.int/search/en/detail.jsf?docId=IN342291243&_cid=P22-MB0H5I-15179-1",
+            "variant": "outline",
+            "align": "left"
+          }
+        },
+        {
+          "type": "Text",
+          "props": {
+            "text": "IN202011018315 · Issued Jan 17, 2024\n\nStatus: Granted\n\nContribution: Lead Inventor",
+            "size": "body",
+            "align": "left"
+          }
+        },
+        {
+          "type": "PhotoGrid",
+          "props": {
+            "images": [
+              {
+                "src": "/gursagar24/img/6cb4a27b-0a6e-4338-9f3d-ba0dfdef3a19.png",
+                "alt": "Patents — image 4"
+              },
+              {
+                "src": "/gursagar24/img/7d13bc7b-6b42-4649-a789-bae069bbb405.png",
+                "alt": "Patents — image 5"
+              },
+              {
+                "src": "/gursagar24/img/c59ed4a2-947f-4117-959e-b463da0f84cf.png",
+                "alt": "Patents — image 6"
+              },
+              {
+                "src": "/gursagar24/img/94aa5b47-ccac-4f24-a7b9-f14bfbfbbd69.png",
+                "alt": "Patents — image 7"
+              }
+            ],
+            "columns": "4",
+            "gap": "small"
+          }
+        },
+        {
+          "type": "Button",
+          "props": {
+            "label": "See Patent",
+            "href": "https://patents.google.com/patent/WO2024239013A1/en?q=(gursagar)&oq=gursagar",
+            "variant": "outline",
+            "align": "left"
+          }
+        },
+        {
+          "type": "Text",
+          "props": {
+            "text": "MOTION CONVERTING ATTACHMENT FOR A SURGICAL TOOL",
+            "size": "lead",
+            "align": "left"
+          }
+        },
+        {
+          "type": "Text",
+          "props": {
+            "text": "WO2024239013 · Filed May 20, 2024\n\nStatus: Published\n\nContribution: Lead Inventor",
+            "size": "body",
+            "align": "left"
+          }
+        },
+        {
+          "type": "Button",
+          "props": {
+            "label": "See Patent",
+            "href": "https://patentscope.wipo.int/search/en/detail.jsf?docId=IN374031347&_cid=P11-MB4AQF-85961-1",
+            "variant": "outline",
+            "align": "left"
+          }
+        },
+        {
+          "type": "Text",
+          "props": {
+            "text": "MULTIFUNCTION SWITCH",
+            "size": "lead",
+            "align": "left"
+          }
+        },
+        {
+          "type": "Text",
+          "props": {
+            "text": "IN202011014294 · Issued Jan 8, 2024\n\nStatus: Granted\n\nContribution: Co-Inventor",
+            "size": "body",
+            "align": "left"
+          }
+        },
+        {
+          "type": "Button",
+          "props": {
+            "label": "See Patent",
+            "href": "https://patentscope.wipo.int/search/en/detail.jsf?docId=IN394086875&_cid=P22-LK2WV7-16979-1",
+            "variant": "outline",
+            "align": "left"
+          }
+        },
+        {
+          "type": "Text",
+          "props": {
+            "text": "HYBRID AIR COOLER",
+            "size": "lead",
+            "align": "left"
+          }
+        },
+        {
+          "type": "Text",
+          "props": {
+            "text": "IN202111025881 · Filed June 10, 2021\n\nStatus: Published\n\nContribution: Co-Inventor",
+            "size": "body",
+            "align": "left"
+          }
+        },
+        {
+          "type": "Button",
+          "props": {
+            "label": "See Patent",
+            "href": "https://patentscope.wipo.int/search/en/detail.jsf?docId=IN414842150&_cid=P11-MB5YN1-73976-1",
+            "variant": "outline",
+            "align": "left"
+          }
+        },
+        {
+          "type": "Text",
+          "props": {
+            "text": "SYSTEM AND METHOD OF CONTROLLABLY OPERATING A WATER HEATER",
+            "size": "lead",
+            "align": "left"
+          }
+        },
+        {
+          "type": "Text",
+          "props": {
+            "text": "IN202211008779 · Filed Feb 19, 2022\n\nStatus: Granted\n\nContribution: Co-Inventor",
+            "size": "body",
+            "align": "left"
+          }
+        },
+        {
+          "type": "Text",
+          "props": {
+            "text": "2 provisional patent applications in process as of Dec 2025, Check my LinkedIn for more!",
+            "size": "body",
+            "align": "left"
+          }
+        },
+        {
+          "type": "Button",
+          "props": {
+            "label": "Gursagar's Linkedin",
+            "href": "https://www.linkedin.com/in/gursagar24/",
+            "variant": "outline",
+            "align": "left"
+          }
+        }
+      ]
+    },
+    {
+      "title": "Recommendations",
+      "slug": "recommendations",
+      "inNav": true,
+      "blocks": [
+        {
+          "type": "Heading",
+          "props": {
+            "text": "Recommendations",
+            "size": "l",
+            "align": "left"
+          }
+        },
+        {
+          "type": "Image",
+          "props": {
+            "src": "/gursagar24/img/afd5f4c3-c501-49f9-8105-ba90fea37427.jpg",
+            "alt": "LinkedIn recommendation from Riya G.",
+            "caption": "Recommendation from Riya G.",
+            "width": "normal"
+          }
+        },
+        {
+          "type": "Button",
+          "props": {
+            "label": "View on LinkedIn",
+            "href": "https://www.linkedin.com/in/riya-g-5b18a0b3/",
+            "variant": "outline",
+            "align": "left"
+          }
+        },
+        {
+          "type": "Spacer",
+          "props": {
+            "size": "s"
+          }
+        },
+        {
+          "type": "Image",
+          "props": {
+            "src": "/gursagar24/img/781289d8-e167-477e-ab23-0b012f5ab3eb.jpg",
+            "alt": "LinkedIn recommendation from Aaron Hoffmann",
+            "caption": "Recommendation from Aaron Hoffmann",
+            "width": "normal"
+          }
+        },
+        {
+          "type": "Button",
+          "props": {
+            "label": "View on LinkedIn",
+            "href": "https://www.linkedin.com/in/aaron-hoffmann-616a2226/",
+            "variant": "outline",
+            "align": "left"
+          }
+        },
+        {
+          "type": "Spacer",
+          "props": {
+            "size": "s"
+          }
+        },
+        {
+          "type": "Image",
+          "props": {
+            "src": "/gursagar24/img/66e41db9-c3b0-4511-8518-6f958c19a18e.jpg",
+            "alt": "LinkedIn recommendation from Ankur Bhagat",
+            "caption": "Recommendation from Ankur Bhagat",
+            "width": "normal"
+          }
+        },
+        {
+          "type": "Button",
+          "props": {
+            "label": "View on LinkedIn",
+            "href": "https://www.linkedin.com/in/ankur-bhagat-879b3213/",
+            "variant": "outline",
+            "align": "left"
+          }
+        },
+        {
+          "type": "Spacer",
+          "props": {
+            "size": "s"
+          }
+        },
+        {
+          "type": "Image",
+          "props": {
+            "src": "/gursagar24/img/dcb79ada-c571-42da-948b-8a6472f7a055.jpg",
+            "alt": "LinkedIn recommendation from Ritesh Hooda",
+            "caption": "Recommendation from Ritesh Hooda",
+            "width": "normal"
+          }
+        },
+        {
+          "type": "Button",
+          "props": {
+            "label": "View on LinkedIn",
+            "href": "https://www.linkedin.com/in/ritesh-hooda-34b38461/",
+            "variant": "outline",
+            "align": "left"
+          }
+        },
+        {
+          "type": "Spacer",
+          "props": {
+            "size": "s"
+          }
+        },
+        {
+          "type": "Image",
+          "props": {
+            "src": "/gursagar24/img/65c21cfb-703a-4fa7-bc00-5fab26078a2b.jpg",
+            "alt": "LinkedIn recommendation from Ashutosh Kumar",
+            "caption": "Recommendation from Ashutosh Kumar",
+            "width": "normal"
+          }
+        },
+        {
+          "type": "Button",
+          "props": {
+            "label": "View on LinkedIn",
+            "href": "https://www.linkedin.com/in/ashutosh-kumar-12033619b/",
+            "variant": "outline",
+            "align": "left"
+          }
+        },
+        {
+          "type": "Spacer",
+          "props": {
+            "size": "s"
+          }
+        },
+        {
+          "type": "Image",
+          "props": {
+            "src": "/gursagar24/img/110c3eb9-d768-4ca4-87dd-143e0e2370a6.jpg",
+            "alt": "LinkedIn recommendation from Gaurav Anerao",
+            "caption": "Recommendation from Gaurav Anerao",
+            "width": "normal"
+          }
+        },
+        {
+          "type": "Button",
+          "props": {
+            "label": "View on LinkedIn",
+            "href": "https://www.linkedin.com/in/gaurav-anerao/",
+            "variant": "outline",
+            "align": "left"
+          }
+        },
+        {
+          "type": "Spacer",
+          "props": {
+            "size": "s"
+          }
+        },
+        {
+          "type": "Image",
+          "props": {
+            "src": "/gursagar24/img/dfaa2a54-06fb-4c03-80d5-94cd48c4abea.jpg",
+            "alt": "LinkedIn recommendation from Anoop Singh",
+            "caption": "Recommendation from Anoop Singh",
+            "width": "normal"
+          }
+        },
+        {
+          "type": "Button",
+          "props": {
+            "label": "View on LinkedIn",
+            "href": "https://www.linkedin.com/in/anoop-singh-pmp/",
+            "variant": "outline",
+            "align": "left"
+          }
+        },
+        {
+          "type": "Spacer",
+          "props": {
+            "size": "s"
+          }
+        }
+      ]
+    },
+    {
+      "title": "NER",
+      "slug": "ner",
+      "inNav": true,
+      "blocks": [
+        {
+          "type": "Heading",
+          "props": {
+            "text": "NER",
+            "size": "l",
+            "align": "left"
+          }
+        },
+        {
+          "type": "Image",
+          "props": {
+            "src": "/gursagar24/img/196a4544-d557-435d-9724-23933321a86a.png",
+            "alt": "NER — image 1",
+            "caption": "",
+            "width": "wide"
+          }
+        },
+        {
+          "type": "Image",
+          "props": {
+            "src": "/gursagar24/img/56db0aae-4422-46a5-95c4-991cdfb89fd0.jpg",
+            "alt": "NER — image 2",
+            "caption": "",
+            "width": "wide"
+          }
+        },
+        {
+          "type": "Button",
+          "props": {
+            "label": "Search for records on NER Website (EA ID: 10314812)",
+            "href": "https://portal.engineersaustralia.org.au/ner/portfolio/VkZhOHFvS1ptZ21GcXhGVEZFMkRkUT09",
+            "variant": "outline",
+            "align": "left"
+          }
+        }
+      ]
+    },
+    {
+      "title": "Contact",
+      "slug": "contact",
+      "inNav": true,
+      "blocks": [
+        {
+          "type": "Heading",
+          "props": {
+            "text": "Contact",
+            "size": "l",
+            "align": "left"
+          }
+        },
+        {
+          "type": "Image",
+          "props": {
+            "src": "/gursagar24/img/b5181aae-9549-443e-b4df-70eb1366d346.jpg",
+            "alt": "Contact — image 1",
+            "caption": "",
+            "width": "wide"
+          }
+        },
+        {
+          "type": "Text",
+          "props": {
+            "text": "Thanks for visiting, I’d love to hear back!",
+            "size": "lead",
+            "align": "left"
+          }
+        },
+        {
+          "type": "Text",
+          "props": {
+            "text": "Here are my contact details:\n\nMobile: 0481 839 246\n\nEmail : gursagar.virdi1@gmail.com",
+            "size": "body",
+            "align": "left"
+          }
+        },
+        {
+          "type": "Button",
+          "props": {
+            "label": "Contact Gursagar on LinkedIn",
+            "href": "https://www.linkedin.com/in/gursagar24/",
+            "variant": "outline",
+            "align": "left"
+          }
+        },
+        {
+          "type": "Contact",
+          "props": {
+            "heading": "Send me a message",
+            "text": "It comes straight to my WebCV inbox.",
+            "email": "",
+            "form": "yes"
+          }
+        }
+      ]
+    }
+  ],
+  "projects": [
+    {
+      "title": "Epicardial PFA Isolator Clamp (EPIC)",
+      "slug": "epicardial-pfa-isolator-clamp-epic",
+      "subtitle": "CathRx",
+      "year": "2025",
+      "cover": "/gursagar24/img/e3fe8635-43e8-4e66-a2fe-339f5000c978.jpg",
+      "blocks": [
+        {
+          "type": "Heading",
+          "props": {
+            "text": "Preface",
+            "size": "s",
+            "align": "left"
+          }
+        },
+        {
+          "type": "Text",
+          "props": {
+            "text": "The EPIC Clamp (Epicardial PFA Isolation Clamp) is a next-generation cardiac ablation device designed for minimally invasive surgery (MIS). Unlike traditional clamps that rely on radiofrequency (RF) or cryoablation and require open-heart access, EPIC delivers Pulsed Field Ablation (PFA) in a way that selectively targets cardiac cells while sparing surrounding tissues. The clamp’s swiveling jaw mechanism enables precise and stable pulmonary vein isolation, a critical step in treating Atrial Fibrillation (AFib).",
+            "size": "body",
+            "align": "left"
+          }
+        },
+        {
+          "type": "Heading",
+          "props": {
+            "text": "Problem Statement",
+            "size": "s",
+            "align": "left"
+          }
+        },
+        {
+          "type": "Text",
+          "props": {
+            "text": "Existing epicardial clamps on the market are not designed for MIS due to their rigid jaws and large profiles, requiring open-heart surgery for proper placement. This poses several challenges:\n• Limited Access: Conventional clamps cannot fit through small thoracoscopic ports, making MIS procedures impossible.\n• Inconsistent Contact: Fixed-jaw clamps do not conform to cardiac anatomy, leading to uneven energy delivery and incomplete pulmonary vein isolation.\n• Tissue Trauma: Without adaptive motion, clamps can cause excessive force on tissue, leading to potential damage and procedural inefficiencies.\n• Complex Procedures: Surgeons must work around the limitations of existing RF or cryo clamps, increasing operative time and reducing procedural confidence.",
+            "size": "body",
+            "align": "left"
+          }
+        },
+        {
+          "type": "Heading",
+          "props": {
+            "text": "Solution",
+            "size": "s",
+            "align": "left"
+          }
+        },
+        {
+          "type": "Text",
+          "props": {
+            "text": "I am developing the EPIC Clamp to solve these challenges with a swiveling jaw design that allows the clamp to collapse into a slim “I” shape for easy insertion through an MIS introducer, then expand into a “C” shape for secure tissue engagement. The jaws independently swivel, adjusting to the anatomical curvature of the pulmonary veins, ensuring consistent and complete energy delivery. This design enables precise, controlled PFA energy application, reducing the risk of collateral damage to surrounding tissues while maintaining high procedural efficiency.",
+            "size": "body",
+            "align": "left"
+          }
+        },
+        {
+          "type": "Heading",
+          "props": {
+            "text": "Result",
+            "size": "s",
+            "align": "left"
+          }
+        },
+        {
+          "type": "Text",
+          "props": {
+            "text": "The EPIC Clamp is the first and only epicardial PFA clamp designed for MIS procedures, significantly expanding treatment options for AFib. Clinical feedback is already confirming:\n• Improved Procedural Confidence: Surgeons can perform PFA without concerns of collateral damage, unlike RF and cryo clamps.\n• Optimized Contact & Energy Delivery: The adaptive jaw motion ensures uniform pulmonary vein isolation, improving treatment effectiveness.\n• Reduced Trauma & Learning Curve: MIS-compatible design allows for a familiar yet safer approach for surgeons experienced with traditional RF clamps.",
+            "size": "body",
+            "align": "left"
+          }
+        },
+        {
+          "type": "Heading",
+          "props": {
+            "text": "My Role/Contribution",
+            "size": "s",
+            "align": "left"
+          }
+        },
+        {
+          "type": "Text",
+          "props": {
+            "text": "• Working as a lead design engineer, came up with the novel jaw swivel mechanism, enabling MIS access while ensuring stable contact for effective PFA energy delivery.\n• Engineering the mechanical architecture, including CAD (Creo), simulations, calculations, and tolerance stack-ups, while following GD&T, DFA, and DFM principles.\n• Leading iterative prototyping, refining the design based on surgeon feedback to optimize usability and safety.\n• Collaborating with cross-functional teams, including clinical, regulatory and manufacturing, to ensure design feasibility and compliance with regulatory framework .\n• Risk management by complying to ISO 14971, Failure modes and effects analysis (FMEA), Usability analysis\n• Creating test protocols and collaborating with test labs\n• Collaborating with manufacturing team for Process optimization and feedback\n• Contributing to patent filings, protecting the novel design features of the EPIC Clamp.",
+            "size": "body",
+            "align": "left"
+          }
+        },
+        {
+          "type": "Heading",
+          "props": {
+            "text": "Interesting fact about EPIC",
+            "size": "s",
+            "align": "left"
+          }
+        },
+        {
+          "type": "Text",
+          "props": {
+            "text": "The design of handle has been inspired from Kerrison bone punches - a common tool used in spine surgeries. I first used a Kerrison as part of a Cadaver lab at Cork, Ireland in 2023.",
+            "size": "body",
+            "align": "left"
+          }
+        },
+        {
+          "type": "Image",
+          "props": {
+            "src": "/gursagar24/img/40deb7ba-2cca-47e4-835d-3f92649136af.png",
+            "alt": "Epicardial PFA Isolator Clamp (EPIC) — image 1",
+            "caption": "",
+            "width": "wide"
+          }
+        },
+        {
+          "type": "Image",
+          "props": {
+            "src": "/gursagar24/img/dd51e0b4-60c3-472a-b580-d7794010927c.png",
+            "alt": "Epicardial PFA Isolator Clamp (EPIC) — image 2",
+            "caption": "",
+            "width": "wide"
+          }
+        },
+        {
+          "type": "Image",
+          "props": {
+            "src": "/gursagar24/img/fcb7241e-c232-442c-b739-0aee611b55db.png",
+            "alt": "Epicardial PFA Isolator Clamp (EPIC) — image 3",
+            "caption": "",
+            "width": "wide"
+          }
+        },
+        {
+          "type": "Heading",
+          "props": {
+            "text": "Tech stack used",
+            "size": "s",
+            "align": "left"
+          }
+        },
+        {
+          "type": "Text",
+          "props": {
+            "text": "CAD — Solid Works\nSimulation — SolidWorks Motion\nCalculations, Tolerance Stack-up — Microsoft Excel\nManufacturing — 3D Printing, Manual Machining\nMaterial Selection and DFA\nCoding — Python (ODE solver), Google Colab",
+            "size": "body",
+            "align": "left"
+          }
+        },
+        {
+          "type": "Text",
+          "props": {
+            "text": "Disclaimer: The information presented in this page is based on published information in form of patents and articles, and does not disclose any commercially sensitive details.",
+            "size": "body",
+            "align": "left"
+          }
+        }
+      ]
+    },
+    {
+      "title": "Oscillating Attachment (OSCA)",
+      "slug": "oscillating-attachment-osca",
+      "subtitle": "Stryker Corporation",
+      "year": "2022",
+      "cover": "/gursagar24/img/2fc5d5a1-4701-433a-a10f-ead57dd9bdd6.jpg",
+      "blocks": [
+        {
+          "type": "Heading",
+          "props": {
+            "text": "Preface",
+            "size": "s",
+            "align": "left"
+          }
+        },
+        {
+          "type": "Text",
+          "props": {
+            "text": "The Oscillating Attachment (OSCA) is engineered to work with Stryker’s Signature 2 High-Speed Motors (75,000 RPM). This attachment converts the motor's rotational motion into oscillation at the cutting bur, reducing soft-tissue damage while enabling precise cutting in cortical bone.",
+            "size": "body",
+            "align": "left"
+          }
+        },
+        {
+          "type": "Heading",
+          "props": {
+            "text": "Problem Statement",
+            "size": "s",
+            "align": "left"
+          }
+        },
+        {
+          "type": "Text",
+          "props": {
+            "text": "Conventional high-speed rotational surgical drills are prone to soft tissue wrap on the rotating cutting tool, where surrounding tissue entangles around the rotating shaft of the cutting bur. The continuously rotating bur can catch and uproot adjacent tissue, leading to tissue accumulation on the bur shank and obstructing the clinician’s line of sight. When operating near critical anatomical structures, there is a risk of the drill catching or nicking vital tissue, potentially increasing procedure time and causing complications.\n\nAdditionally, conventional high-speed drills have a high tendency to skive, sliding uncontrollably across the bone surface at elevated speeds.\n\nAccordingly, there is a need for a bone cutting tool that operates within an optimal middle ground, providing a safety profile while maintaining the cutting speed and efficiency of a high-speed drill.",
+            "size": "body",
+            "align": "left"
+          }
+        },
+        {
+          "type": "Heading",
+          "props": {
+            "text": "Solution",
+            "size": "s",
+            "align": "left"
+          }
+        },
+        {
+          "type": "Text",
+          "props": {
+            "text": "The Oscillating Attachment (OSCA) utilizes advanced linkages to convert rotational motion from the motor into oscillating motion at the cutting bur, minimizing soft tissue damage while maintaining cutting speed.",
+            "size": "body",
+            "align": "left"
+          }
+        },
+        {
+          "type": "Heading",
+          "props": {
+            "text": "Result",
+            "size": "s",
+            "align": "left"
+          }
+        },
+        {
+          "type": "Text",
+          "props": {
+            "text": "Positive feedback across different labs in Europe, Asia and North America.",
+            "size": "body",
+            "align": "left"
+          }
+        },
+        {
+          "type": "Heading",
+          "props": {
+            "text": "My Role/Contribution",
+            "size": "s",
+            "align": "left"
+          }
+        },
+        {
+          "type": "Text",
+          "props": {
+            "text": "• Worked as a senior design engineer, brainstormed the initial concept and delivered comprehensive mechanical designs using CAD (Creo), Technical Drawings, simulations, mechanism calculations, bevel gear design, shimming scheme, and tolerance stack-ups, while adhering to GD&T, DFA, and DFM principles.\n• Collaborated with a global team from the US and Ireland to define technical requirements, gather customer inputs, and enhance mechanical designs through validation testing.\n• Worked closely with US marketing to identify customer pain points, conducting VOCs with surgeons and translating feedback into actionable design improvements.\n• Designed and prototyped over 40 iterations based on inputs from VOCs, to successfully operate the device at acceptable cutting efficacy for a full duty cycle.\n• Developed an innovative method to reduce device heating by nearly 60% as per the feedback, also ensuring compliance with IEC 60601 temperature requirements.\n• Filed multiple invention disclosures focused on heat dissipation, hybrid attachments, and reliability improvements, all currently in the filing stage.\n• Managed timelines, orchestrated tasks to meet milestones. Maintained compliance with ISO13485 for product development lifecycle.\n• Filed a patent for a Motion-Converting Attachment for a Surgical Tool: PCT/US2024/030219.",
+            "size": "body",
+            "align": "left"
+          }
+        },
+        {
+          "type": "PhotoGrid",
+          "props": {
+            "images": [
+              {
+                "src": "/gursagar24/img/edcd4adc-c0aa-42db-95e0-f91d869226e1.jpg",
+                "alt": "Oscillating Attachment (OSCA) — image 1"
+              },
+              {
+                "src": "/gursagar24/img/82d8e5ea-5d98-455b-ae6a-7ba9f9ab8b9e.jpg",
+                "alt": "Oscillating Attachment (OSCA) — image 2"
+              }
+            ],
+            "columns": "2",
+            "gap": "small"
+          }
+        },
+        {
+          "type": "Heading",
+          "props": {
+            "text": "Interesting facts about OSCA",
+            "size": "s",
+            "align": "left"
+          }
+        },
+        {
+          "type": "Text",
+          "props": {
+            "text": "• OSCA uses the world's smallest Crank-Rocker mechanism to achieve the oscillating motion at output\n• Used Creo Mechanism (simulation module) extensively to optimize the mechanism for high forces\n• Developed a mathematical model of the mechanism in an Excel sheet with over 400+ cross-references and formulas",
+            "size": "body",
+            "align": "left"
+          }
+        },
+        {
+          "type": "Image",
+          "props": {
+            "src": "/gursagar24/img/f7db4bfe-36bd-4d23-a64e-eb8f8f3bf445.jpg",
+            "alt": "Oscillating Attachment (OSCA) — image 3",
+            "caption": "",
+            "width": "wide"
+          }
+        },
+        {
+          "type": "Heading",
+          "props": {
+            "text": "Tech stack used",
+            "size": "s",
+            "align": "left"
+          }
+        },
+        {
+          "type": "Text",
+          "props": {
+            "text": "CAD, Drafting, GD&T — PTC Creo\nSimulation & Thermal Analysis — Creo Mechanism, Ansys\nCalculations, Tolerance Stack-up — Microsoft Excel\nMaterial Selection. DFA, DFM and Six-Sigma principles",
+            "size": "body",
+            "align": "left"
+          }
+        },
+        {
+          "type": "Text",
+          "props": {
+            "text": "Disclaimer: The information presented in this page is based on published information in form of patents and articles, and does not disclose any commercially sensitive details.",
+            "size": "body",
+            "align": "left"
+          }
+        }
+      ]
+    },
+    {
+      "title": "Meditate Air Purifier",
+      "slug": "meditate-air-purifier",
+      "subtitle": "Havells",
+      "year": "2022",
+      "cover": "/gursagar24/img/b17ffcef-dd53-450a-9288-c534293f66b5.jpg",
+      "blocks": [
+        {
+          "type": "Heading",
+          "props": {
+            "text": "Preface",
+            "size": "s",
+            "align": "left"
+          }
+        },
+        {
+          "type": "Text",
+          "props": {
+            "text": "The Mediate Air Purifier is a high-performance air purification system designed to remove airborne pollutants using NASA's TiO2 technology to kill airborne viruses and bacteria while maintaining optimal airflow and low noise levels. Engineered for both residential and commercial spaces, it integrates advanced HEPA filtration, aerodynamically optimized impellers, and intelligent airflow management to deliver clean, breathable air with a CADR (Clean Air Delivery Rate) of 400 m³/h and 250 m³/h.",
+            "size": "body",
+            "align": "left"
+          }
+        },
+        {
+          "type": "Heading",
+          "props": {
+            "text": "Problem Statement",
+            "size": "s",
+            "align": "left"
+          }
+        },
+        {
+          "type": "Text",
+          "props": {
+            "text": "Traditional air purifiers often struggle with:\n• Inefficient Airflow Management: Poorly designed impellers lead to air stagnation and uneven filtration, reducing efficiency by over 30%.\n• High Noise Levels: Many purifiers produce more than 65 dB of noise due to turbulent airflow and inefficient fan designs.\n• Reduced Filter Efficiency Over Time: Uneven Pressure drops across the HEPA filter can decrease performance, leading to reduced filtration efficiency.\n• Energy Consumption vs. Performance Trade-off: Balancing high filtration efficiency with power consumption below 80W remains a key challenge.",
+            "size": "body",
+            "align": "left"
+          }
+        },
+        {
+          "type": "Heading",
+          "props": {
+            "text": "Solution",
+            "size": "s",
+            "align": "left"
+          }
+        },
+        {
+          "type": "Text",
+          "props": {
+            "text": "The Mediate Air Purifier tackles these issues with:\n• A custom-designed impeller optimized for high static pressure and smooth airflow reduces noise levels to 50 dB. The impeller was designed in a way that it was injection moulded as a single part.\n• Advanced airflow dynamics ensuring uniform pressure distribution across the HEPA filter, enhancing particle capture efficiency by 23% and extending filter life.\n• Fan curve analysis and pressure difference calculations to optimize motor performance, delivering 18% better energy efficiency compared to market alternatives.\n• Injection-molded components designed for lightweight yet durable construction, reducing manufacturing costs while maintaining high performance.",
+            "size": "body",
+            "align": "left"
+          }
+        },
+        {
+          "type": "Image",
+          "props": {
+            "src": "/gursagar24/img/f0ba8f7d-9c8d-4809-bea5-d3ea5612a1a7.jpg",
+            "alt": "Meditate Air Purifier — image 1",
+            "caption": "",
+            "width": "wide"
+          }
+        },
+        {
+          "type": "PhotoGrid",
+          "props": {
+            "images": [
+              {
+                "src": "/gursagar24/img/8b7b5381-461f-4fec-a030-fd4a22613729.jpg",
+                "alt": "Meditate Air Purifier — image 2"
+              },
+              {
+                "src": "/gursagar24/img/72a2fcbf-1058-48ae-a129-897ef492743f.jpg",
+                "alt": "Meditate Air Purifier — image 3"
+              }
+            ],
+            "columns": "2",
+            "gap": "small"
+          }
+        },
+        {
+          "type": "Heading",
+          "props": {
+            "text": "Fun Fact",
+            "size": "s",
+            "align": "left"
+          }
+        },
+        {
+          "type": "Text",
+          "props": {
+            "text": "for AP 250, The TiO2 module was positioned inside the filter to optimize space. The casing assembly for the TiO2 module was designed with a single injection-molded part. This design allowed the two parts to fit together, forming a cylindrical casing that not only supported the module but also provided the necessary structural integrity to the device. This was a major win from a cost perspective, and my team appreciated me a lot for this!",
+            "size": "body",
+            "align": "left"
+          }
+        },
+        {
+          "type": "Button",
+          "props": {
+            "label": "Havells Studio Meditate",
+            "href": "https://havells.com/havells_studio/",
+            "variant": "outline",
+            "align": "left"
+          }
+        },
+        {
+          "type": "Text",
+          "props": {
+            "text": "Disclaimer: The information presented in this page is based on published information in form of patents and articles, and does not disclose any commercially sensitive details.",
+            "size": "body",
+            "align": "left"
+          }
+        }
+      ]
+    },
+    {
+      "title": "Venturi Air Cooler and VTAS Valve",
+      "slug": "venturi-air-cooler-and-vtas-valve",
+      "subtitle": "Havells",
+      "year": "2019",
+      "cover": "/gursagar24/img/25771a81-ef3a-40f7-ba6b-57cc142166a3.jpg",
+      "blocks": [
+        {
+          "type": "Heading",
+          "props": {
+            "text": "Preface",
+            "size": "s",
+            "align": "left"
+          }
+        },
+        {
+          "type": "Text",
+          "props": {
+            "text": "The Venturi Air Cooler is an innovative cooling system that operates on Bernoulli’s theorem, using the Venturi effect to lift water without a pump. This energy-efficient and sustainable design significantly reduces power consumption while enhancing cooling performance. Unlike traditional air coolers that rely on mechanical pumps to circulate water, this system leverages airflow dynamics to create a pressure drop, lifting and evaporating water efficiently.",
+            "size": "body",
+            "align": "left"
+          }
+        },
+        {
+          "type": "Heading",
+          "props": {
+            "text": "Problem Statement",
+            "size": "s",
+            "align": "left"
+          }
+        },
+        {
+          "type": "Text",
+          "props": {
+            "text": "Conventional air coolers face multiple challenges:\n• High Energy Consumption: Water pumps consume a substantial amount of power, increasing operational costs.\n• Maintenance & Reliability Issues: Pump-based systems are prone to failures due to clogging, wear, and power fluctuations.\n• Limited Cooling Efficiency: Inconsistent water flow affects the evaporation rate, leading to inefficient cooling.\n• Environmental Impact: Additional electrical components increase the carbon footprint and operational inefficiencies.",
+            "size": "body",
+            "align": "left"
+          }
+        },
+        {
+          "type": "Heading",
+          "props": {
+            "text": "Solution",
+            "size": "s",
+            "align": "left"
+          }
+        },
+        {
+          "type": "Text",
+          "props": {
+            "text": "The Venturi Air Cooler eliminates the need for a pump by harnessing the Venturi effect. As air flows through a narrowed passage, its velocity increases, creating a pressure drop that naturally lifts water from the reservoir to the cooling pads. This results in higher evaporation rates, improved cooling performance, and significant energy savings. By integrating aerodynamic principles into the design, the system ensures consistent water flow without mechanical assistance, making it more reliable and eco-friendly. VTAS valve, which was invented for this cooler ensures, the water can be sucked through the entire height, even when the available suction pressure is low. This is achieved using the flexible diaphragms and a pin in VTAS valve. When the chamber of the valve is filled with water using the available suction pressure, The flexible diaphragms switch to a configuration sing the weight of water, which cut-offs the suction line from VTAs chamber and opens up the infusion tube.",
+            "size": "body",
+            "align": "left"
+          }
+        },
+        {
+          "type": "Heading",
+          "props": {
+            "text": "Results",
+            "size": "s",
+            "align": "left"
+          }
+        },
+        {
+          "type": "Text",
+          "props": {
+            "text": "The Venturi Air Cooler stands out as a low-maintenance, energy-efficient alternative to traditional coolers. It offers:\n• Up to 30% lower power consumption compared to pump-based coolers.\n• Increased cooling efficiency due to improved evaporation dynamics.\n• Reduced maintenance as there are no pumps or moving parts prone to failure.\n• Sustainable operation, contributing to a greener environment.",
+            "size": "body",
+            "align": "left"
+          }
+        },
+        {
+          "type": "Heading",
+          "props": {
+            "text": "My Role/Contribution",
+            "size": "s",
+            "align": "left"
+          }
+        },
+        {
+          "type": "Text",
+          "props": {
+            "text": "• Led the mechanical design, handling CAD modeling, detailed drawings, and calculations to ensure optimal airflow and pressure dynamics.\n• Developed and tested multiple prototypes, refining the design through iterative improvements.\n• Optimized component selection and material design for durability, performance, and cost-effectiveness.\n• Collaborated with cross-functional teams to integrate the system into Havells’ product lineup, ensuring feasibility and manufacturability.",
+            "size": "body",
+            "align": "left"
+          }
+        },
+        {
+          "type": "PhotoGrid",
+          "props": {
+            "images": [
+              {
+                "src": "/gursagar24/img/aca40a5f-4d00-4643-a0db-c880c33e809e.jpg",
+                "alt": "Venturi Air Cooler and VTAS Valve — image 1"
+              },
+              {
+                "src": "/gursagar24/img/c9ba0f2b-a814-430f-b532-d1f444312d9d.jpg",
+                "alt": "Venturi Air Cooler and VTAS Valve — image 2"
+              }
+            ],
+            "columns": "2",
+            "gap": "small"
+          }
+        },
+        {
+          "type": "Heading",
+          "props": {
+            "text": "Interesting facts about Venturi Air Cooler",
+            "size": "s",
+            "align": "left"
+          }
+        },
+        {
+          "type": "Text",
+          "props": {
+            "text": "• It was my first project after university in 2019.\n• The idea took root after a casual conversation with my manager. It lingered in the back of my mind throughout the day, but it wasn’t until I was in the bathroom (away from distractions) that it clicked.",
+            "size": "body",
+            "align": "left"
+          }
+        },
+        {
+          "type": "Image",
+          "props": {
+            "src": "/gursagar24/img/c37dc329-9fa3-477e-b9d3-bf1192841ef7.jpg",
+            "alt": "Venturi Air Cooler and VTAS Valve — image 3",
+            "caption": "",
+            "width": "wide"
+          }
+        },
+        {
+          "type": "Heading",
+          "props": {
+            "text": "Working",
+            "size": "s",
+            "align": "left"
+          }
+        },
+        {
+          "type": "Text",
+          "props": {
+            "text": "As the air enters the converging diverging duct and travels along the length, it gains kinetic energy and looses its pressure as an effect of gradually reducing cross sectional area.\n\nThe gain in kinetic energy translates to high velocity of air, which results in a negative pressure area at the point of lowest cross sectional area. This negative pressure lifts the water and it is then infused in the throat section and the fast-moving air mixes with these water droplets, causing the water to evaporate. This process of evaporation absorbs heat from the air, making the air cooler.\n\nThe height up to which the water can be lifted naturally using the throat is referred to as Primary Height. But usually this height is very low and cannot be practically used to mae a commercial product.\n\nIn order to lift water from more height two additional mechanisms are deployed:\n• High Pressure Pipe: When air enters the converging-diverging duct, it creates a high pressure region at the entrance. This High pressure air is directed to air sealed water chamber and the VTAS valve. This high pressure is used to increase the local chamber pressure up from atmospheric. Due to this increased chamber pressure water could be lifted to more height as difference between the suction pressure and the local chamber pressure drives the height at which water can be lifted.",
+            "size": "body",
+            "align": "left"
+          }
+        },
+        {
+          "type": "Image",
+          "props": {
+            "src": "/gursagar24/img/4e1d5d16-61e0-4072-97a2-7ced565a48e7.jpg",
+            "alt": "Venturi Air Cooler and VTAS Valve — image 4",
+            "caption": "",
+            "width": "wide"
+          }
+        },
+        {
+          "type": "Heading",
+          "props": {
+            "text": "VTAS Valve (Vacuum To Atmospheric Switch Valve)",
+            "size": "s",
+            "align": "left"
+          }
+        },
+        {
+          "type": "Text",
+          "props": {
+            "text": "The VTAS valve is the heart of this pump-less system. It's a mechanically operated valve that works automatically in a cycle to lift water from the tank and inject it into the airflow.\n\nHere is its working cycle explained:\n1. The low pressure created in the throat of the cooler is strong enough to suck water up to primary height from the main tank and into a small chamber within the VTAS valve.\n2. As the valve's chamber fills with water upto primary height, it becomes heavier. This added weight causes the chamber to physically move downwards. This downward movement does two things simultaneously: it closes the suction pipe from the water tank and opens up the infusion tube.\n3. With the water inlet now closed, high-pressure air from the high pressure pipe rushes into the VTAS valve chamber. This pressure forces the water out of the chamber through infusion pipe that leads directly into the low-pressure throat of the cooler (covering the secondary height) , where it is atomized and mixed with the main airflow.\n4. Once the valve chamber is empty, it becomes light again and moves back up to its original position. This re-opens the inlet from the water tank and closes the high-pressure air pipe. The cycle then repeats, continuously supplying water for the cooling process.\n\nEssentially, the VTAS valve acts like a smart, self-operating bucket, using changes in weight and air pressure to automatically scoop up water and throw it into the air stream at just the right time and place\n\nDisclaimer: The information presented in this page is based on published information in form of patents and articles, and does not disclose any commercially sensitive details.",
+            "size": "body",
+            "align": "left"
+          }
+        }
+      ]
+    },
+    {
+      "title": "Hero MotoCorp",
+      "slug": "hero-motocorp",
+      "subtitle": "6 Months paid industry Internship",
+      "year": "2018",
+      "cover": "/gursagar24/img/f9accbc6-e711-4462-8936-8a1c27e2682c.jpg",
+      "blocks": [
+        {
+          "type": "Text",
+          "props": {
+            "text": "As a paid intern for 6 months at the world's largest two-wheeler automobile company, I gained valuable experience working on multiple projects. Key projects included enhancing 5C part traceability by implementing data matrix coding and analyzing machining processes to reduce yield loss.",
+            "size": "lead",
+            "align": "left"
+          }
+        },
+        {
+          "type": "Button",
+          "props": {
+            "label": "Final Internship Report",
+            "href": "https://drive.google.com/file/d/1mvoP8Tdi-Wz8ObDhDkuSD1Hk4IaC75os/view?usp=sharing",
+            "variant": "outline",
+            "align": "left"
+          }
+        },
+        {
+          "type": "Button",
+          "props": {
+            "label": "Final internship PPT",
+            "href": "https://docs.google.com/presentation/d/1IkjyBBu4V6IT8JMoHrli0tsQcvOhNjAA/edit?usp=sharing&ouid=106640003196443605298&rtpof=true&sd=true",
+            "variant": "outline",
+            "align": "left"
+          }
+        },
+        {
+          "type": "Button",
+          "props": {
+            "label": "Watch the video",
+            "href": "https://www-ccv.adobe.io/v1/player/ccv/Sot2AgmcwzD/embed?bgcolor=%23191919&lazyLoading=true&api_key=BehancePro2View",
+            "variant": "outline",
+            "align": "left"
+          }
+        },
+        {
+          "type": "Text",
+          "props": {
+            "text": "Testing different sizes of data matrics scan code on engine casing with a laser engraving machine!",
+            "size": "body",
+            "align": "left"
+          }
+        },
+        {
+          "type": "PhotoGrid",
+          "props": {
+            "images": [
+              {
+                "src": "/gursagar24/img/59b6d031-41a8-4799-a1aa-40a418a6b5dd.jpg",
+                "alt": "Hero MotoCorp — image 1"
+              },
+              {
+                "src": "/gursagar24/img/aaa6816f-2f91-44c2-9104-c9aba122379d.jpg",
+                "alt": "Hero MotoCorp — image 2"
+              },
+              {
+                "src": "/gursagar24/img/5c7657c0-48ce-44f4-9ea0-e0deda4aa8ab.jpg",
+                "alt": "Hero MotoCorp — image 3"
+              }
+            ],
+            "columns": "3",
+            "gap": "small"
+          }
+        }
+      ]
+    },
+    {
+      "title": "Fateh Motorsports",
+      "slug": "fateh-motorsports",
+      "subtitle": "Automotive Society of TIET",
+      "year": "2017",
+      "cover": "/gursagar24/img/ae6999a2-9515-4aa9-ae66-5918757d3611.jpg",
+      "blocks": [
+        {
+          "type": "Text",
+          "props": {
+            "text": "As an Engine Engineer at Fateh Motorsports, I was responsible for the design, analysis, and optimization of the engine systems for our race vehicle TUFF 10. My role involved developing, analyzing engine data, and ensuring that the engines met stringent reliability and power output targets. I worked closely with the design and testing teams to fine-tune engine components, optimize fuel efficiency, and improve overall performance. Fateh Motorsports is a formula student team from Thapar University.",
+            "size": "lead",
+            "align": "left"
+          }
+        },
+        {
+          "type": "Button",
+          "props": {
+            "label": "Team Fateh Instagram",
+            "href": "https://www.instagram.com/fateh_fsae/?hl=en",
+            "variant": "outline",
+            "align": "left"
+          }
+        },
+        {
+          "type": "Button",
+          "props": {
+            "label": "Team Fateh Website",
+            "href": "https://teamfateh.com/fs",
+            "variant": "outline",
+            "align": "left"
+          }
+        },
+        {
+          "type": "Image",
+          "props": {
+            "src": "/gursagar24/img/8b3ce693-5b41-4701-86b1-bee1f446aaee.jpg",
+            "alt": "Fateh Motorsports — image 1",
+            "caption": "",
+            "width": "wide"
+          }
+        },
+        {
+          "type": "PhotoGrid",
+          "props": {
+            "images": [
+              {
+                "src": "/gursagar24/img/0512d08e-0563-4bfe-8a19-f6fa1aed858b.jpg",
+                "alt": "Fateh Motorsports — image 2"
+              },
+              {
+                "src": "/gursagar24/img/dd328ad3-7d06-4c83-a02a-f15497396ae3.jpg",
+                "alt": "Fateh Motorsports — image 3"
+              },
+              {
+                "src": "/gursagar24/img/5a8aa608-6031-4dfa-b504-abf66376b644.jpg",
+                "alt": "Fateh Motorsports — image 4"
+              },
+              {
+                "src": "/gursagar24/img/258c5191-c01e-4d80-8306-7a725ee5d4ab.jpg",
+                "alt": "Fateh Motorsports — image 5"
+              },
+              {
+                "src": "/gursagar24/img/fdc9a9a2-6e53-4395-9892-9500e9debcaa.jpg",
+                "alt": "Fateh Motorsports — image 6"
+              }
+            ],
+            "columns": "4",
+            "gap": "small"
+          }
+        },
+        {
+          "type": "Image",
+          "props": {
+            "src": "/gursagar24/img/a7259343-b188-44a9-a2ed-65c978d73a8d.jpg",
+            "alt": "Fateh Motorsports — image 7",
+            "caption": "",
+            "width": "wide"
+          }
+        }
+      ]
+    }
+  ]
+}

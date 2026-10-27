@@ -6,9 +6,9 @@ export const metadata: Metadata = { title: { absolute: 'Create your portfolio â€
 export default async function SignupPage({
   searchParams,
 }: {
-  searchParams: Promise<{ slug?: string }>;
+  searchParams: Promise<{ slug?: string; claim?: string }>;
 }) {
-  const { slug } = await searchParams;
+  const { slug, claim } = await searchParams;
   return (
     <main id="main" className="wc-container wc-auth">
       <section className="wc-auth-aside" aria-label="What happens next">
@@ -49,7 +49,10 @@ export default async function SignupPage({
         <p className="wc-mono-label">Step 1 of 2 Â· Account</p>
         <h2 style={{ marginTop: 10 }}>Create your portfolio</h2>
         <p className="wc-sub">Next, you will fill it in from the editor.</p>
-        <SignupForm initialSlug={typeof slug === 'string' ? slug : ''} />
+        <SignupForm
+          initialSlug={typeof slug === 'string' ? slug : ''}
+          claim={typeof claim === 'string' ? claim.slice(0, 100) : ''}
+        />
         <p className="wc-alt">
           Already have a portfolio? <a href="/admin/login">Sign in</a>
         </p>

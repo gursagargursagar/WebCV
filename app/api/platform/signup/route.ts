@@ -2,12 +2,17 @@ import { NextResponse } from 'next/server';
 import { INITIAL_CMS_STATE } from '@/cms/data/initialData';
 import type { CMSState } from '@/cms/types/cms';
 import { assertSameOrigin } from '@/core/auth/guard';
-import { checkPassphraseStrength, hashPassphrase, isBreachedPassphrase } from '@/core/auth/passphrase';
+import {
+  checkPassphraseStrength,
+  hashPassphrase,
+  isBreachedPassphrase,
+} from '@/core/auth/passphrase';
 import { clientKey, rateLimit } from '@/core/auth/ratelimit';
 import { createSession } from '@/core/auth/session';
 import { MAX_EMAIL_LENGTH } from '@/core/email/send';
 import { isMultiSite, isValidSlug } from '@/core/site/constants';
 import { registerSite, siteByEmail, siteBySlug } from '@/core/site/registry';
+import { claimMatches, heldSeed, isHeldSlug } from '@/core/site/claims';
 import { runWithSite } from '@/core/site/tenant';
 import { WEBCV_THEME_ID } from '@/core/theme/presets';
 import { getStorageAdapter } from '@/core/storage/registry';
@@ -41,7 +46,10 @@ export async function POST(req: Request) {
   // and a visitor should know to come back rather than retry.
   if (!hasDatabase()) {
     return NextResponse.json(
-      { ok: false, error: 'Sign-ups open shortly. WebCV is still being connected to its database.' },
+      {
+        ok: false,
+        error: 'Sign-ups open shortly. WebCV is still being connected to its database.',
+      },
       { status: 503 }
     );
   }
@@ -57,9 +65,15 @@ export async function POST(req: Request) {
   }
 
   const body = (await req.json().catch(() => null)) as Record<string, unknown> | null;
-  const name = String(body?.name ?? '').trim().slice(0, 80);
-  const slug = String(body?.slug ?? '').trim().toLowerCase();
-  const email = String(body?.email ?? '').trim().toLowerCase();
+  const name = String(body?.name ?? '')
+    .trim()
+    .slice(0, 80);
+  const slug = String(body?.slug ?? '')
+    .trim()
+    .toLowerCase();
+  const email = String(body?.email ?? '')
+    .trim()
+    .toLowerCase();
   const passphrase = String(body?.passphrase ?? '');
 
   const fail = (field: string, error: string, status = 400) =>
@@ -68,6 +82,10 @@ export async function POST(req: Request) {
   if (!name) return fail('name', 'Enter your name.');
   if (!isValidSlug(slug)) {
     return fail('slug', 'Use 3–32 lowercase letters, numbers or hyphens, not a reserved word.');
+  }
+  // A held address opens only with its claim code (see core/site/claims.ts).
+  if (isHeldSlug(slug) && !claimMatches(slug, String(body?.claim ?? ''))) {
+    return fail('slug', 'That address is taken.', 409);
   }
   if (!email || email.length > MAX_EMAIL_LENGTH || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
     return fail('email', 'That does not look like an email address.');
@@ -113,6 +131,12 @@ export async function POST(req: Request) {
     });
     await adapter.writeSnapshot('published', seed);
     await adapter.writeSnapshot('draft', structuredClone(seed));
+    // A held address arrives with its portfolio already built, in the Studio.
+    const studio = heldSeed(slug);
+    if (studio) {
+      await adapter.records.put('studio', 'draft', studio);
+      await adapter.records.put('studio', 'published', studio);
+    }
     await createSession(email, 1);
   });
 

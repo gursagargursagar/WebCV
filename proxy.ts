@@ -71,13 +71,12 @@ async function routeMultiSite(req: NextRequest): Promise<NextResponse | 'admin' 
   if (pathname === '/login') return redirect('/admin/login');
   // The platform's landing pages: the template gallery and one page per audience.
   if (pathname === '/templates') return rewrite('/platform/templates', null);
+  // The example portfolio: a fictional person's site, written in code.
+  if (first === 'example' && /^\/example(\/[a-z0-9-]+)?\/?$/.test(pathname)) {
+    return rewrite(`/wcs-example${pathname.slice('/example'.length).replace(/\/$/, '')}`, null);
+  }
   if (first === 'for' && /^\/for\/[a-z-]+\/?$/.test(pathname)) {
     return rewrite(`/platform${pathname.replace(/\/$/, '')}`, null);
-  }
-
-  // Gursagar's original hand-built portfolio, kept exactly where it was.
-  if (pathname === '/gursagar24' || pathname === '/gursagar24/') {
-    return rewrite('/gursagar24/index.html', null);
   }
 
   if (isValidSlug(first)) {
@@ -105,6 +104,9 @@ async function routeMultiSite(req: NextRequest): Promise<NextResponse | 'admin' 
       const slugs = await studioSlugs(first);
       if (slugs?.has(segment))
         return rewrite(segment ? `${STUDIO_ROUTE}/${segment}` : STUDIO_ROUTE, first);
+      // Gursagar's original hand-built page, until the address is claimed and
+      // its Studio version published.
+      if (first === 'gursagar24' && segment === '') return rewrite('/gursagar24/index.html', null);
     }
     return rewrite(rest, first);
   }

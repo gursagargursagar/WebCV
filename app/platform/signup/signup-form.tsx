@@ -24,7 +24,7 @@ function strength(value: string): { score: 0 | 1 | 2 | 3 | 4; label: string } {
   return { score: 2, label: 'Good. Longer is stronger.' };
 }
 
-export function SignupForm({ initialSlug }: { initialSlug: string }) {
+export function SignupForm({ initialSlug, claim = '' }: { initialSlug: string; claim?: string }) {
   const id = useId();
   const [name, setName] = useState('');
   const [slug, setSlug] = useState(normaliseSlug(initialSlug));
@@ -39,7 +39,7 @@ export function SignupForm({ initialSlug }: { initialSlug: string }) {
   const slugRef = useRef<HTMLInputElement>(null);
   const emailRef = useRef<HTMLInputElement>(null);
   const passRef = useRef<HTMLInputElement>(null);
-  const check = useSlugCheck(slug);
+  const check = useSlugCheck(slug, claim);
   const meter = strength(passphrase);
 
   function validate(): Partial<Record<Field, string>> {
@@ -78,7 +78,7 @@ export function SignupForm({ initialSlug }: { initialSlug: string }) {
       const res = await fetch('/api/platform/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: name.trim(), slug, email: email.trim(), passphrase }),
+        body: JSON.stringify({ name: name.trim(), slug, email: email.trim(), passphrase, claim }),
       });
       const data = (await res.json().catch(() => ({}))) as {
         ok?: boolean;

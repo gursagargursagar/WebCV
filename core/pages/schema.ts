@@ -36,6 +36,8 @@ export const RESERVED_TOP_LEVEL: readonly string[] = [
   'wcs-render',
   // A portfolio's statutory declaration page (see proxy.ts).
   'wcs-declaration',
+  // The example portfolio (see proxy.ts).
+  'wcs-example',
   'case-studies',
   'contact',
   'cv',

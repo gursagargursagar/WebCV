@@ -1,0 +1,29 @@
+/* The strip above the example portfolio that says it is one. */
+.wcx-banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px 18px;
+  padding: 10px 16px;
+  background: #16181a;
+  color: #f4f4f1;
+  font:
+    14px/1.5 system-ui,
+    sans-serif;
+  text-align: center;
+}
+.wcx-banner p {
+  margin: 0;
+}
+.wcx-banner a {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  padding: 0 16px;
+  border-radius: 999px;
+  background: #f4f4f1;
+  color: #16181a;
+  font-weight: 600;
+  text-decoration: none;
+}

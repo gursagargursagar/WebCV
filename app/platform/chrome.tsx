@@ -12,7 +12,7 @@ export function TopBar() {
           <a className="wc-hide-md" href="/templates">
             Templates
           </a>
-          <a className="wc-hide-md" href="/gursagar24">
+          <a className="wc-hide-md" href="/example">
             Example
           </a>
           <a className="wc-hide-md" href="/#faq">
@@ -41,7 +41,7 @@ export function Foot() {
             <a href="/signup">Create a portfolio</a>
             <a href="/admin/login">Sign in</a>
             <a href="/templates">Templates</a>
-            <a href="/gursagar24">Example portfolio</a>
+            <a href="/example">Example portfolio</a>
             <a href="/#faq">FAQ</a>
             {AUDIENCES.map((a) => (
               <a key={a.slug} href={`/for/${a.slug}`}>

@@ -250,32 +250,32 @@ export default async function PlatformHome() {
       <section className="wc-section" aria-labelledby="example-title">
         <div className="wc-container wc-example">
           <div>
-            <p className="wc-mono-label">04 / A real one</p>
+            <p className="wc-mono-label">04 / An example</p>
             <h2 id="example-title" style={{ marginTop: 22 }}>
               See a finished portfolio.
             </h2>
             <p className="wc-section-lede">
-              Gursagar Virdi’s portfolio: mechanical design work, internships and recommendations,
-              on one page with light and dark modes.
+              A product design engineer’s portfolio: projects with the numbers behind them, an About
+              page and a contact form. The person is fictional; the template is real.
             </p>
             <p style={{ marginTop: 28 }}>
-              <a className="wc-button" href="/gursagar24">
-                Open webcv.au/gursagar24 <span aria-hidden>↗</span>
+              <a className="wc-button" href="/example">
+                Open the example <span aria-hidden>↗</span>
               </a>
             </p>
           </div>
           <figure className="wc-stage">
-            <a href="/gursagar24" aria-label="Open Gursagar Virdi's portfolio">
+            <a href="/example" aria-label="Open the example portfolio">
               <img
                 src="/platform/example-portfolio.png"
-                alt="Gursagar Virdi's portfolio: the greeting 'Hi, I'm Guru' above large project images."
+                alt="The example portfolio: a headline about designing parts, above a grid of engineering projects."
                 width={1280}
                 height={800}
                 loading="lazy"
               />
             </a>
             <figcaption>
-              <span className="wc-mono-label">webcv.au/gursagar24</span>
+              <span className="wc-mono-label">webcv.au/example</span>
               <span className="wc-mono-label">Example</span>
             </figcaption>
           </figure>

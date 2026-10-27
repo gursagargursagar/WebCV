@@ -25,6 +25,8 @@ export interface FactDraft {
   name: string;
   issuer: string;
   number: string;
+  /** Read from a CV, with something not found there word for word. */
+  check?: boolean;
 }
 
 const BLANK: Omit<FactDraft, 'kind'> = {
@@ -299,9 +301,17 @@ export function FactsForm({
                 Remove
               </button>
             </div>
+            {fact.check ? (
+              <p role="note" className="m-0 rounded-xl bg-surface-secondary p-3 text-sm">
+                Check this one first: part of it was not in your CV word for word, so it may have
+                been misread.
+              </p>
+            ) : null}
             <FactFields
               fact={fact}
-              onChange={(next) => setFacts(facts.map((f, j) => (j === i ? next : f)))}
+              onChange={(next) =>
+                setFacts(facts.map((f, j) => (j === i ? { ...next, check: false } : f)))
+              }
             />
           </li>
         ))}

@@ -160,7 +160,7 @@ export const AUDIENCES: AudiencePage[] = [
       },
       {
         q: 'Can I see an example?',
-        a: 'Yes — webcv.au/gursagar24 is a mechanical design engineer’s portfolio built on WebCV.',
+        a: 'Yes — webcv.au/example is a sample product design engineer’s portfolio (a fictional person) built on WebCV.',
       },
     ],
   },

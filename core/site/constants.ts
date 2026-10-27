@@ -57,10 +57,13 @@ export const RESERVED_SLUGS = new Set([
   'media',
   'www',
   'webcv',
-  'gursagar24',
+  // The example portfolio (app/platform/example).
+  'example',
   // The Studio's editor and the route its published pages render through.
   'studio',
   'wcs-render',
+  'wcs-declaration',
+  'wcs-example',
   // Platform landing pages (proxy.ts).
   'templates',
   'for',
