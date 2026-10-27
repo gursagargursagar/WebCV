@@ -431,7 +431,7 @@
 .wc-section-index {
   margin-top: 10px !important;
 }
-.wc-section h2 {
+.wc-section h2:not(.wcs *) {
   max-width: 18ch;
   font-family: var(--font-display);
   font-size: clamp(2.5rem, 4.6vw, 4.6rem);
@@ -1025,5 +1025,129 @@
 @media (prefers-reduced-motion: reduce) {
   .wc * {
     transition: none !important;
+  }
+}
+
+/* ------------------------------------------------------- SEO pages */
+.wc-page-head h1 {
+  max-width: 18ch;
+  margin-top: 28px;
+  font-family: var(--font-display);
+  font-size: clamp(2.6rem, 5.4vw, 5rem);
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -0.045em;
+}
+/* The lede's ink is set for the white front-page hero; these heads sit on the theme. */
+.wc-page-head .wc-hero-lede {
+  max-width: 62ch;
+  margin-top: 22px;
+  color: var(--text-secondary);
+}
+.wc-tpl-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 28px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.wc-tpl-card {
+  container-type: inline-size;
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  background: var(--surface-primary);
+}
+/* A real template home page, laid out at 1280px and zoomed down to the card. */
+.wc-tpl-frame {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 1280 / 860;
+  border-bottom: 1px solid var(--border-color);
+  background: var(--surface-secondary);
+}
+/* Zoom steps with the card's width; the page widens a little within each step
+   so it always fills the frame edge to edge. */
+.wc-tpl-frame > div {
+  --z: 0.25;
+  width: calc(100cqw / var(--z));
+  /* 860/1280 of the card: the frame's aspect ratio. */
+  height: calc(67.1875cqw / var(--z));
+  zoom: var(--z);
+  pointer-events: none;
+}
+@container (min-width: 340px) {
+  .wc-tpl-frame > div {
+    --z: 0.27;
+  }
+}
+@container (min-width: 370px) {
+  .wc-tpl-frame > div {
+    --z: 0.29;
+  }
+}
+@container (min-width: 420px) {
+  .wc-tpl-frame > div {
+    --z: 0.33;
+  }
+}
+@container (min-width: 500px) {
+  .wc-tpl-frame > div {
+    --z: 0.39;
+  }
+}
+@container (min-width: 600px) {
+  .wc-tpl-frame > div {
+    --z: 0.47;
+  }
+}
+@container (min-width: 700px) {
+  .wc-tpl-frame > div {
+    --z: 0.55;
+  }
+}
+.wc-section .wc-tpl-body h2 {
+  max-width: none;
+  font-family: var(--font-display);
+  line-height: 1.15;
+  font-size: 1.6rem;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+}
+.wc-tpl-body p {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+}
+.wc-tpl-for a {
+  text-transform: capitalize;
+}
+.wc-links-title {
+  font-family: var(--font-display);
+  font-size: 1.8rem !important;
+}
+.wc-links {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 10px 28px;
+  margin: 22px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.wc-links a {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+@media (max-width: 1080px) {
+  .wc-tpl-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 640px) {
+  .wc-tpl-grid {
+    grid-template-columns: minmax(0, 1fr);
   }
 }

@@ -79,5 +79,11 @@ export interface StudioMeta {
   hrefFor(slug: string): string;
   /** Where the Contact block posts; null where messages cannot be sent (previews). */
   contactEndpoint: string | null;
+  /**
+   * A picture of a page shown inside another page (template previews): its
+   * headings render as plain text, so the host page keeps one outline and
+   * search engines do not read sample headlines as the host's own.
+   */
+  decorative?: boolean;
   edit?: StudioEditHooks;
 }

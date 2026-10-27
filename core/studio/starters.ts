@@ -315,3 +315,24 @@ export function blankPage(kind: 'page' | 'project'): Data {
     { type: 'Text', props: { text: 'Start writing here.', size: 'body', align: 'left' } },
   ]);
 }
+
+function projectSlug(title: string): string {
+  return title
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '');
+}
+
+const STARTER_SLUGS = new Set(
+  Object.values(COPY).flatMap((copy) => copy.projects.map((p) => projectSlug(p.title)))
+);
+
+/**
+ * Whether a site still carries a starter's sample projects — published before
+ * its owner replaced them. Search engines see the same sample pages on every
+ * such site, so these stay out of the sitemap and are marked noindex until
+ * they are edited.
+ */
+export function looksLikeStarter(pageSlugs: string[]): boolean {
+  return pageSlugs.filter((slug) => STARTER_SLUGS.has(slug)).length >= 3;
+}

@@ -1,8 +1,9 @@
-import { NextResponse } from 'next/server';
+import { NextResponse, after } from 'next/server';
 import { requireOwner, UnauthorizedError } from '@/core/auth/guard';
 import { clientKey, rateLimit } from '@/core/auth/ratelimit';
 import { currentSite } from '@/core/site/tenant';
 import { publishDraft, readStudio, unpublish } from '@/core/studio/store';
+import { pingIndexNow } from '@/core/seo/indexnow';
 
 /**
  * Publishing the Studio: the saved draft becomes what visitors see.
@@ -49,8 +50,15 @@ export async function POST(req: Request) {
     );
   }
 
-  await publishDraft();
-  return NextResponse.json({ ok: true, site: await currentSite() });
+  const published = await publishDraft();
+  const site = await currentSite();
+  // Tell the search engines that listen (Bing and friends) once the response
+  // is on its way; Google picks the change up from the sitemap.
+  if (site && published) {
+    const paths = published.pages.map((p) => (p.slug ? `/${site}/${p.slug}` : `/${site}`));
+    after(() => pingIndexNow(paths));
+  }
+  return NextResponse.json({ ok: true, site });
 }
 
 /** Takes the Studio site down, so the address shows the classic site again. */

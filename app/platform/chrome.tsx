@@ -1,3 +1,4 @@
+import { AUDIENCES } from '@/core/platform/seo-pages';
 import { Brand } from '@/components/scai/Brand';
 import { ThemeToggle } from '@/components/scai/ThemeToggle';
 
@@ -8,8 +9,8 @@ export function TopBar() {
       <div className="wc-container wc-nav-inner">
         <Brand />
         <nav className="wc-nav-links" aria-label="Main">
-          <a className="wc-hide-md" href="/#how-it-works">
-            How it works
+          <a className="wc-hide-md" href="/templates">
+            Templates
           </a>
           <a className="wc-hide-md" href="/gursagar24">
             Example
@@ -39,8 +40,14 @@ export function Foot() {
           <nav className="wc-footer-links" aria-label="Footer">
             <a href="/signup">Create a portfolio</a>
             <a href="/admin/login">Sign in</a>
+            <a href="/templates">Templates</a>
             <a href="/gursagar24">Example portfolio</a>
             <a href="/#faq">FAQ</a>
+            {AUDIENCES.map((a) => (
+              <a key={a.slug} href={`/for/${a.slug}`}>
+                Portfolios for {a.slug}
+              </a>
+            ))}
           </nav>
         </div>
         <p className="wc-fine">

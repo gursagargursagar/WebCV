@@ -139,7 +139,9 @@ export async function findSiteBySlug(sql: Sql, slug: string): Promise<SiteRow | 
     SELECT slug, email, created_at FROM wc_sites WHERE slug = ${slug}
   `;
   const row = rows[0];
-  return row ? { slug: row.slug, email: row.email, createdAt: new Date(row.created_at).toISOString() } : null;
+  return row
+    ? { slug: row.slug, email: row.email, createdAt: new Date(row.created_at).toISOString() }
+    : null;
 }
 
 export async function findSiteByEmail(sql: Sql, email: string): Promise<SiteRow | null> {
@@ -147,7 +149,9 @@ export async function findSiteByEmail(sql: Sql, email: string): Promise<SiteRow 
     SELECT slug, email, created_at FROM wc_sites WHERE email = ${email}
   `;
   const row = rows[0];
-  return row ? { slug: row.slug, email: row.email, createdAt: new Date(row.created_at).toISOString() } : null;
+  return row
+    ? { slug: row.slug, email: row.email, createdAt: new Date(row.created_at).toISOString() }
+    : null;
 }
 
 /** Inserts the site, or reports which of slug and email is already taken. */
@@ -168,6 +172,63 @@ export async function insertSite(
 export async function countSites(sql: Sql): Promise<number> {
   const rows = await sql<{ n: string }[]>`SELECT count(*)::text AS n FROM wc_sites`;
   return Number(rows[0]?.n ?? 0);
+}
+
+export interface PublishedSiteRow {
+  slug: string;
+  /** Page addresses of the published Studio site, or null if it has none. */
+  studioSlugs: string[] | null;
+  studioUpdatedAt: string | null;
+  /** The classic site's last publish, when its owner has published it themselves. */
+  classicUpdatedAt: string | null;
+  classicNoindex: boolean;
+}
+
+/**
+ * Every portfolio with something worth a search engine's time, for the
+ * platform sitemap. Read across sites on purpose — this is the one directory
+ * listing, and it carries addresses and dates only.
+ *
+ * A classic site counts once its owner has published it (revision above the
+ * sign-up seed's), so a sitemap never advertises a page of sample content.
+ */
+export async function listPublishedSites(sql: Sql, limit = 40_000): Promise<PublishedSiteRow[]> {
+  const rows = await sql<
+    {
+      slug: string;
+      studio_slugs: string[] | null;
+      studio_updated: Date | null;
+      classic_updated: Date | null;
+      classic_revision: number | null;
+      robots: string | null;
+    }[]
+  >`
+    SELECT s.slug,
+           CASE WHEN r.data IS NULL THEN NULL
+                ELSE ARRAY(SELECT p->>'slug' FROM jsonb_array_elements(r.data->'pages') AS p)
+           END AS studio_slugs,
+           r.updated_at AS studio_updated,
+           c.updated_at AS classic_updated,
+           c.revision AS classic_revision,
+           c.data->'seo'->>'robots' AS robots
+      FROM wc_sites s
+      LEFT JOIN wc_records r
+             ON r.site = s.slug AND r.collection = 'studio' AND r.id = 'published'
+      LEFT JOIN wc_content c
+             ON c.site = s.slug AND c.channel = 'published'
+     ORDER BY s.created_at ASC
+     LIMIT ${limit}
+  `;
+  return rows.map((row) => ({
+    slug: row.slug,
+    studioSlugs: row.studio_slugs,
+    studioUpdatedAt: row.studio_updated ? new Date(row.studio_updated).toISOString() : null,
+    classicUpdatedAt:
+      row.classic_updated && (row.classic_revision ?? 0) > 1
+        ? new Date(row.classic_updated).toISOString()
+        : null,
+    classicNoindex: /noindex/i.test(row.robots ?? ''),
+  }));
 }
 
 /* --------------------------------------------------------------- content */

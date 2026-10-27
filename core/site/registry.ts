@@ -6,6 +6,8 @@ import {
   findSiteByEmail,
   findSiteBySlug,
   insertSite,
+  listPublishedSites,
+  type PublishedSiteRow,
   type SiteRow,
 } from '@/core/storage/adapters/_shared/postgres-sites';
 import { isMultiSite } from './constants';
@@ -47,6 +49,11 @@ export async function siteByEmail(email: string): Promise<SiteRow | null> {
 
 export async function registerSite(slug: string, email: string) {
   return insertSite(await ready(), slug, email.trim().toLowerCase());
+}
+
+/** Portfolios a search engine should know about; see `listPublishedSites`. */
+export async function publishedSites(): Promise<PublishedSiteRow[]> {
+  return listPublishedSites(await ready());
 }
 
 export async function siteCount(): Promise<number> {

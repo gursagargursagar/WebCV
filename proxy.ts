@@ -69,6 +69,11 @@ async function routeMultiSite(req: NextRequest): Promise<NextResponse | 'admin' 
   if (pathname === '/') return rewrite('/platform', null);
   if (pathname === '/signup' || pathname === '/setup') return rewrite('/platform/signup', null);
   if (pathname === '/login') return redirect('/admin/login');
+  // The platform's landing pages: the template gallery and one page per audience.
+  if (pathname === '/templates') return rewrite('/platform/templates', null);
+  if (first === 'for' && /^\/for\/[a-z-]+\/?$/.test(pathname)) {
+    return rewrite(`/platform${pathname.replace(/\/$/, '')}`, null);
+  }
 
   // Gursagar's original hand-built portfolio, kept exactly where it was.
   if (pathname === '/gursagar24' || pathname === '/gursagar24/') {

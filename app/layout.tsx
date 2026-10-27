@@ -3,6 +3,7 @@ import { buildMetadata } from '@/core/content/metadata';
 import { getContentForChannel, getPublishedContent } from '@/core/content/read';
 import { currentChannel } from '@/core/pages/read';
 import { siteLanguage } from '@/core/content/language';
+import { isMultiSite } from '@/core/site/constants';
 import { fediverseCreator, profileLinks } from '@/core/content/profiles';
 import { buildThemeStylesheet } from '@/core/theme/tokens';
 import { buildLayoutStylesheet } from '@/core/theme/layout-tokens';
@@ -39,6 +40,14 @@ export async function generateMetadata(): Promise<Metadata> {
   const meta = await buildMetadata();
   return {
     ...meta,
+    // Search Console and Bing Webmaster Tools ownership, set as environment
+    // variables in the host so no code change is needed to add or rotate them.
+    verification: {
+      google: process.env.GOOGLE_SITE_VERIFICATION || undefined,
+      other: process.env.BING_SITE_VERIFICATION
+        ? { 'msvalidate.01': process.env.BING_SITE_VERIFICATION }
+        : undefined,
+    },
     icons: {
       icon: content.seo.favicon || '/favicon.png',
       apple: '/apple-touch-icon.png',
@@ -132,7 +141,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     // suppressHydrationWarning: the script above mutates <html> before React
     // sees it, so the server and client markup differ here by design.
     <html
-      lang={siteLanguage(content.settings)}
+      // WebCV is Australian: its own pages, and portfolios that never chose a
+      // language, are marked en-AU rather than generic English.
+      lang={isMultiSite() && !content.settings?.language ? 'en-AU' : siteLanguage(content.settings)}
       data-theme="dark"
       // Lets a theme carry a few shape rules the token system cannot
       // express — see the Swiss Cheese rules in src/styles/scai.css.

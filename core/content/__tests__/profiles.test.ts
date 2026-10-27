@@ -29,4 +29,14 @@ describe('profileLinks', () => {
     ).toEqual([]);
     expect(profileLinks(undefined)).toEqual([]);
   });
+
+  it("drops bare homepages, which are nobody's profile", () => {
+    expect(
+      profileLinks([
+        link('https://www.linkedin.com'),
+        link('https://github.com/'),
+        link('https://github.com/someone'),
+      ])
+    ).toEqual(['https://github.com/someone']);
+  });
 });

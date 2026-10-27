@@ -96,6 +96,25 @@ function Anchor({
   );
 }
 
+/** A heading, or the same text as a plain block inside a decorative preview. */
+function H({
+  level,
+  puck,
+  className,
+  children,
+}: {
+  level: 1 | 2;
+  puck: Puck | undefined;
+  className?: string;
+  children: ReactNode;
+}) {
+  if (metaOf(puck)?.decorative) {
+    return <div className={`${className ?? ''} wcs-h${level}`.trim()}>{children}</div>;
+  }
+  const Tag = level === 1 ? 'h1' : 'h2';
+  return <Tag className={className}>{children}</Tag>;
+}
+
 function Placeholder({ children }: { children: ReactNode }) {
   return <div className="wcs-placeholder">{children}</div>;
 }
@@ -244,7 +263,9 @@ function hero(): ComponentConfig<HeroProps> {
     },
     render: ({ heading, text, size, align, puck }) => (
       <section className={`wcs-block wcs-hero s-${size} a-${align}`}>
-        <h1 className="wcs-hero-title">{heading}</h1>
+        <H level={1} puck={puck} className="wcs-hero-title">
+          {heading}
+        </H>
         {isBlank(text) && !metaOf(puck)?.edit ? null : <p className="wcs-hero-text">{text}</p>}
       </section>
     ),
@@ -268,9 +289,11 @@ function heading(): ComponentConfig<HeadingProps> {
       align: { type: 'radio', label: 'Alignment', options: ALIGN },
     },
     defaultProps: { text: 'A section title', size: 'm', align: 'left' },
-    render: ({ text, size, align }) => (
+    render: ({ text, size, align, puck }) => (
       <div className={`wcs-block wcs-heading s-${size} a-${align}`}>
-        <h2>{text}</h2>
+        <H level={2} puck={puck}>
+          {text}
+        </H>
       </div>
     ),
   };
@@ -441,7 +464,9 @@ function split(kit?: FieldKit): ComponentConfig<SplitProps> {
             {edit ? <edit.ImageTools blockId={id} prop="src" /> : null}
           </div>
           <div className="wcs-split-body">
-            <h2>{heading}</h2>
+            <H level={2} puck={puck}>
+              {heading}
+            </H>
             <p>{text}</p>
           </div>
         </section>
@@ -592,7 +617,11 @@ function projects(): ComponentConfig<ProjectsProps> {
         <section
           className={`wcs-block wcs-projects cols-${columns} shape-${shape} cap-${captions}`}
         >
-          {edit || !isBlank(heading) ? <h2 className="wcs-projects-title">{heading}</h2> : null}
+          {edit || !isBlank(heading) ? (
+            <H level={2} puck={puck} className="wcs-projects-title">
+              {heading}
+            </H>
+          ) : null}
           {list.length === 0 ? (
             <Placeholder>
               No projects yet. Add one from the Pages panel and it appears here.
@@ -661,7 +690,9 @@ function contact(): ComponentConfig<ContactProps> {
       const mail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(address) ? address : '';
       return (
         <section className="wcs-block wcs-contact">
-          <h2>{heading}</h2>
+          <H level={2} puck={puck}>
+            {heading}
+          </H>
           {isBlank(text) && !meta?.edit ? null : <p>{text}</p>}
           {mail ? (
             <p className="wcs-contact-mail">
@@ -830,7 +861,7 @@ function SiteFrame({ children, puck }: { children: ReactNode; puck: Puck }) {
       <main className="wcs-main" id="main">
         {/* Every page has one top-level heading for screen readers and search;
             a page with no Intro block and no project title gets its name. */}
-        {page && page.kind !== 'project' && !meta.hasHeading ? (
+        {page && page.kind !== 'project' && !meta.hasHeading && !meta.decorative ? (
           <h1 className="wcs-visually-hidden">
             {page.slug === '' ? design.siteName : `${page.title} — ${design.siteName}`}
           </h1>
@@ -867,7 +898,9 @@ function SiteFrame({ children, puck }: { children: ReactNode; puck: Puck }) {
               </>
             ) : (
               <>
-                <h1 className="wcs-project-title">{page.title}</h1>
+                <H level={1} puck={puck} className="wcs-project-title">
+                  {page.title}
+                </H>
                 {page.subtitle ? <p className="wcs-project-sub">{page.subtitle}</p> : null}
                 {page.year ? <p className="wcs-project-year">{page.year}</p> : null}
               </>

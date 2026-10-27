@@ -1,66 +1,75 @@
 import { siteCount } from '@/core/site/registry';
+import { JsonLd } from '@/core/content/json-ld-script';
+import { AUDIENCES } from '@/core/platform/seo-pages';
 import { ClaimForm } from './claim-form';
+import { organizationJsonLd, platformUrl } from './seo';
 
 const FEATURES: { label: string; title: string; body: string }[] = [
   {
-    label: 'Address',
-    title: 'Your own link',
-    body: 'Your portfolio lives at webcv.au/your-name. One short link for your CV, LinkedIn and email signature.',
+    label: 'Templates',
+    title: 'Six templates, already filled in',
+    body: 'Start from a finished portfolio website with a home page, projects, About and Contact, then make it yours. Nothing starts blank.',
   },
   {
     label: 'Editor',
-    title: 'Edit everything',
-    body: 'Change any word, image or section from your dashboard. No code, and nothing to redeploy.',
+    title: 'Edit right on the page',
+    body: 'Click any words and type. Replace a picture with one click. The preview is the page, so what you see is what visitors get.',
   },
   {
-    label: 'Preview',
-    title: 'Private until you publish',
-    body: 'Edits stay in a draft only you can see. Preview them, then publish when you are ready.',
+    label: 'Address',
+    title: 'Your own link, free',
+    body: 'Your portfolio lives at webcv.au/your-name: one short link for your résumé, LinkedIn and email signature.',
   },
   {
     label: 'Work',
-    title: 'Projects and case studies',
-    body: 'Show your work with images, outcomes and the tools you used, in the order you choose.',
+    title: 'Projects that tell a story',
+    body: 'Give every project its own page with images, photo grids, video and text, and show them all in a project grid.',
   },
   {
-    label: 'Profile',
-    title: 'Experience and education',
-    body: 'Timelines for your roles and study, recommendations, and a downloadable résumé.',
+    label: 'Devices',
+    title: 'Looks right on every screen',
+    body: 'Every template adapts to phones, tablets and desktops, and you can preview each size while you edit.',
   },
   {
-    label: 'Audience',
-    title: 'Messages in one place',
-    body: 'Visitors write to you from your portfolio. Messages arrive in your dashboard, filtered for spam.',
+    label: 'Contact',
+    title: 'Enquiries in one place',
+    body: 'A contact form on your portfolio sends messages to your WebCV inbox, filtered for spam.',
   },
 ];
 
 const STEPS: { title: string; body: string }[] = [
-  { title: 'Claim your address', body: 'Pick webcv.au/your-name and create an account.' },
-  { title: 'Fill it in', body: 'Add your role, projects, experience and photo in the editor.' },
-  { title: 'Publish and share', body: 'One click puts it live at your address.' },
+  { title: 'Claim your address', body: 'Pick webcv.au/your-name and create a free account.' },
+  { title: 'Pick a template', body: 'Choose one of six designs and edit it right on the page.' },
+  {
+    title: 'Publish and share',
+    body: 'One click puts your portfolio website live at your address.',
+  },
 ];
 
 const FAQ: { q: string; a: string }[] = [
-  { q: 'How much does it cost?', a: 'Creating and publishing a portfolio is free.' },
+  {
+    q: 'How much does WebCV cost?',
+    a: 'Nothing. Creating and publishing a portfolio website at webcv.au/your-name is free ($0).',
+  },
   {
     q: 'Do I need to know how to code?',
-    a: 'No. Everything is edited in forms and previews. If you can write an email, you can build your portfolio.',
+    a: 'No. You click on the page and type, and add blocks such as images, photo grids and video from a panel. If you can write an email, you can build your portfolio.',
+  },
+  {
+    q: 'Who is WebCV for?',
+    a: 'Anyone who needs to show their work: designers, photographers, architects, engineers, writers, students and graduates.',
+  },
+  {
+    q: 'Can I change the template later?',
+    a: 'Yes. Switch templates at any time and every word and picture comes with you.',
+  },
+  {
+    q: 'Who can see my portfolio?',
+    a: 'Anyone with the link, once you publish. Your changes save automatically and stay private until you press Publish.',
   },
   {
     q: 'Can I change my address later?',
     a: 'Your address is your link, so choose it carefully. If you need a different one, create a new portfolio with the new address.',
-  },
-  {
-    q: 'Who can see my portfolio?',
-    a: 'Anyone with the link, once you publish. Drafts stay private to you until you press Publish.',
-  },
-  {
-    q: 'Can I change how it looks?',
-    a: 'Yes. Pick a theme, colours and typefaces in Appearance. Every theme works in light and dark.',
-  },
-  {
-    q: 'Can I take my content with me?',
-    a: 'Yes. The dashboard can download a full backup of your portfolio at any time.',
   },
 ];
 
@@ -77,21 +86,60 @@ export default async function PlatformHome() {
 
   return (
     <main id="main">
+      {/* What WebCV is, for search engines: the organisation, the site, the
+          free product and its common questions. */}
+      <JsonLd
+        data={{
+          '@context': 'https://schema.org',
+          '@graph': [
+            organizationJsonLd(),
+            {
+              '@type': 'WebSite',
+              '@id': platformUrl('/#website'),
+              name: 'WebCV',
+              url: platformUrl('/'),
+              inLanguage: 'en-AU',
+              publisher: { '@id': platformUrl('/#organization') },
+            },
+            {
+              '@type': 'SoftwareApplication',
+              name: 'WebCV',
+              url: platformUrl('/'),
+              applicationCategory: 'DesignApplication',
+              operatingSystem: 'Web',
+              description:
+                'A free portfolio website builder: pick a template, edit it on the page and publish at webcv.au/your-name.',
+              offers: { '@type': 'Offer', price: '0', priceCurrency: 'AUD' },
+              publisher: { '@id': platformUrl('/#organization') },
+            },
+            {
+              '@type': 'FAQPage',
+              mainEntity: FAQ.map((item) => ({
+                '@type': 'Question',
+                name: item.q,
+                acceptedAnswer: { '@type': 'Answer', text: item.a },
+              })),
+            },
+          ],
+        }}
+      />
       {/* --------------------------------------------------------- hero */}
       <section className="wc-hero" aria-labelledby="hero-title">
         <div className="wc-container wc-hero-grid">
           <div className="wc-hero-copy">
             <p className="wc-kicker">
-              <span>WebCV / Portfolio builder</span>
+              <span>Free portfolio website builder</span>
               <span>01 / Your address</span>
             </p>
             <h1 id="hero-title">
               Your work, one link.
-              <span className="wc-hero-subline">A portfolio at webcv.au/you, live in minutes, for free ($0).</span>
+              <span className="wc-hero-subline">
+                A portfolio at webcv.au/you, live in minutes, for free ($0).
+              </span>
             </h1>
             <p className="wc-hero-lede">
-              Pick your address, fill in your projects and experience in a visual editor, and publish.
-              No code, no hosting to set up, and nothing to maintain.
+              Pick a template, change the words and pictures right on the page, and publish your
+              portfolio website. No code, no hosting to set up, and nothing to maintain.
             </p>
           </div>
 
@@ -155,8 +203,8 @@ export default async function PlatformHome() {
             <div>
               <h2 id="features-title">Everything a portfolio needs, already built.</h2>
               <p className="wc-section-lede">
-                Start from a finished layout with sample content, then replace it with your own story
-                one section at a time.
+                Start from a finished portfolio website, then replace the sample content with your
+                own story, one block at a time.
               </p>
             </div>
           </div>
@@ -207,8 +255,8 @@ export default async function PlatformHome() {
               See a finished portfolio.
             </h2>
             <p className="wc-section-lede">
-              Gursagar Virdi’s portfolio: mechanical design work, internships and recommendations, on
-              one page with light and dark modes.
+              Gursagar Virdi’s portfolio: mechanical design work, internships and recommendations,
+              on one page with light and dark modes.
             </p>
             <p style={{ marginTop: 28 }}>
               <a className="wc-button" href="/gursagar24">
@@ -234,17 +282,38 @@ export default async function PlatformHome() {
         </div>
       </section>
 
+      {/* ------------------------------------------------------ made for */}
+      <section className="wc-section" aria-labelledby="for-title">
+        <div className="wc-container">
+          <div className="wc-section-intro">
+            <p className="wc-mono-label wc-section-index">05 / Made for</p>
+            <div>
+              <h2 id="for-title">A portfolio for the work you do.</h2>
+              <p className="wc-section-lede">
+                Templates and tips for each kind of work, or{' '}
+                <a href="/templates">browse all six templates</a>.
+              </p>
+            </div>
+          </div>
+          <ul className="wc-links">
+            {AUDIENCES.map((a) => (
+              <li key={a.slug}>
+                <a href={`/for/${a.slug}`}>{a.title.replace(' | WebCV', '')}</a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+
       {/* ---------------------------------------------------------- faq */}
       <section className="wc-section" id="faq" aria-labelledby="faq-title">
         <div className="wc-container wc-faq">
           <div className="wc-faq-heading">
-            <p className="wc-mono-label">05 / Questions</p>
+            <p className="wc-mono-label">06 / Questions</p>
             <h2 id="faq-title" style={{ marginTop: 22 }}>
               Before you start.
             </h2>
-            <p>
-              Anything else? Sign up and look around. Nothing goes public until you publish.
-            </p>
+            <p>Anything else? Sign up and look around. Nothing goes public until you publish.</p>
           </div>
           <div className="wc-faq-list">
             {FAQ.map((item) => (

@@ -15,7 +15,10 @@ export function profileLinks(links: SocialLinkItem[] | undefined): string[] {
   for (const link of links ?? []) {
     if (link.visible === false) continue;
     const href = sanitizeHref(link.url);
-    if (href && /^https?:\/\//i.test(href)) seen.add(href);
+    // A bare homepage ("https://www.linkedin.com", what the starter content
+    // ships with) is not anybody's profile; claiming it with rel="me" only
+    // tells search engines the site belongs to LinkedIn.
+    if (href && /^https?:\/\/[^/]+\/[^\s]+/i.test(href.replace(/\/+$/, ''))) seen.add(href);
   }
   return [...seen];
 }

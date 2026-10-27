@@ -61,6 +61,9 @@ export const RESERVED_SLUGS = new Set([
   // The Studio's editor and the route its published pages render through.
   'studio',
   'wcs-render',
+  // Platform landing pages (proxy.ts).
+  'templates',
+  'for',
   // Folders in `public/`, served as files at the top level.
   'demo',
   'llms.txt',
