@@ -218,13 +218,10 @@ export async function proxy(req: NextRequest) {
       url.searchParams.set('next', pathname);
       return withId(NextResponse.redirect(url));
     }
-
-    if (hasSessionCookie && isLoginPage) {
-      const url = req.nextUrl.clone();
-      url.pathname = '/admin';
-      url.search = '';
-      return withId(NextResponse.redirect(url));
-    }
+    // A cookie on the sign-in page is not sent onward from here: only its
+    // presence is visible, and a stale one (expired, or for another
+    // portfolio) bounced between here and the admin's guard forever. The
+    // sign-in page checks the session properly and moves on if it is valid.
   }
 
   if (adminHeaders) return withId(NextResponse.next({ request: { headers: adminHeaders } }));

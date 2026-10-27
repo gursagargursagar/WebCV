@@ -1,4 +1,6 @@
 import type { Metadata } from 'next';
+import { redirect } from 'next/navigation';
+import { getOwnerSession } from '@/core/auth/guard';
 import { DEMO_EMAIL, DEMO_PASSPHRASE, isDemoMode } from '@/core/demo/config';
 import { LoginForm } from './login-form';
 import { isMultiSite } from '@/core/site/constants';
@@ -27,10 +29,15 @@ export default async function LoginPage({
   searchParams: Promise<{ next?: string }>;
 }) {
   const { next } = await searchParams;
+  const multi = isMultiSite();
+  const destination = safeNext(next) ?? (multi ? '/admin/studio' : '/admin');
+
+  // Already signed in to this portfolio: skip the form. A cookie that is
+  // present but no longer valid falls through to it instead.
+  if (await getOwnerSession()) redirect(destination);
 
   // WebCV: passkeys need to know which portfolio this browser signs in to,
   // and an emailed code needs a mail server. Offer neither when it would fail.
-  const multi = isMultiSite();
   const showPasskey = !multi || Boolean(await currentSite());
   const showEmailCode = !multi || resolveTransport().kind !== 'none';
 
@@ -39,7 +46,7 @@ export default async function LoginPage({
       showPasskey={showPasskey}
       showEmailCode={showEmailCode}
       // WebCV owners land in the Studio, where their site is.
-      next={safeNext(next) ?? (multi ? '/admin/studio' : undefined)}
+      next={destination}
       demoHint={isDemoMode() ? `Demo — sign in with ${DEMO_EMAIL} and ${DEMO_PASSPHRASE}.` : null}
     />
   );
