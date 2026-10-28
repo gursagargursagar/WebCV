@@ -3,9 +3,10 @@ import 'server-only';
 /**
  * The messages this project sends.
  *
- * Plain text is written first and carries everything; the HTML is a courtesy.
- * No tracking pixels, no remote images, no link wrapping — a portfolio's
- * notification email has no business reporting on the person reading it.
+ * Plain text is written first and carries everything; the HTML wraps the same
+ * words in WebCV's look (the platform's editorial style: logo, ruled mono
+ * label, serif heading). No tracking pixels; the one remote image is WebCV's
+ * own logo, served from webcv.au.
  *
  * User-supplied content appears in the body only. The one place it reaches a
  * header is `Reply-To`, and only after the contact route's `clean()` has
@@ -19,6 +20,68 @@ function escapeHtml(value: string): string {
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;');
+}
+
+const INK = '#101212';
+const BODY = '#3f3c42';
+const MUTED = '#5f615f';
+const PAPER = '#f3f3ef';
+const LINE = '#dadada';
+const SERIF = "Georgia,'Times New Roman',serif";
+const SANS = "-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif";
+const MONO = "ui-monospace,SFMono-Regular,Menlo,Consolas,'Liberation Mono',monospace";
+
+function logoUrl(): string {
+  const origin = process.env.OPB_SITE_URL?.trim().replace(/\/$/, '') || 'https://www.webcv.au';
+  return `${origin}/brand/webcv-mark.png`;
+}
+
+/** A paragraph in the body's type. */
+function para(html: string, style = ''): string {
+  return `<p style="margin:0 0 14px;font:400 15px/1.6 ${SANS};color:${BODY};${style}">${html}</p>`;
+}
+
+/** A link as a button. */
+function button(url: string, label: string): string {
+  return `<table role="presentation" cellpadding="0" cellspacing="0" style="margin:6px 0 18px"><tr><td style="background:${INK};border-radius:999px"><a href="${escapeHtml(url)}" style="display:inline-block;padding:13px 22px;font:600 15px/1 ${SANS};color:#ffffff;text-decoration:none">${escapeHtml(label)}</a></td></tr></table>`;
+}
+
+/**
+ * A link that carries a one-time secret (a reset or confirmation token).
+ *
+ * When the sending domain rewrites links for click tracking, the token would
+ * pass through the tracker on its way. `OPB_MAIL_PLAIN_LINKS=1` shows these
+ * links as text instead, which mail apps still make tappable but send
+ * nowhere else first. Ordinary links stay buttons either way.
+ */
+function secretLink(url: string, label: string): string {
+  if (process.env.OPB_MAIL_PLAIN_LINKS !== '1') return button(url, label);
+  return [
+    para(`${escapeHtml(label)}: open this link.`, 'margin-bottom:8px'),
+    `<div style="margin:0 0 18px;padding:12px 14px;background:${PAPER};border:1px solid ${LINE};border-radius:12px;font:400 13px/1.5 ${MONO};color:${INK};word-break:break-all">${escapeHtml(url)}</div>`,
+  ].join('');
+}
+
+/** WebCV's email frame: logo, ruled label, heading, then the message. */
+function layout(input: { kicker: string; heading: string; body: string; preheader: string }) {
+  return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"><title>${escapeHtml(input.heading)}</title></head>
+<body style="margin:0;padding:0;background:${PAPER}">
+<div style="display:none;max-height:0;overflow:hidden;opacity:0">${escapeHtml(input.preheader)}</div>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:${PAPER}"><tr><td align="center" style="padding:32px 16px">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:520px;background:#ffffff;border:1px solid ${INK};border-radius:18px">
+<tr><td style="padding:26px 32px 0">
+<table role="presentation" cellpadding="0" cellspacing="0"><tr>
+<td style="vertical-align:middle"><img src="${logoUrl()}" width="36" height="36" alt="WebCV" style="display:block;border:0;border-radius:10px"></td>
+<td style="vertical-align:middle;padding-left:10px;font:700 19px/1 ${SERIF};color:${INK};letter-spacing:-0.02em">WebCV</td>
+</tr></table>
+</td></tr>
+<tr><td style="padding:24px 32px 0"><div style="padding-bottom:10px;border-bottom:1px solid ${INK};font:700 11px/1.4 ${MONO};letter-spacing:0.14em;text-transform:uppercase;color:${MUTED}">${escapeHtml(input.kicker)}</div></td></tr>
+<tr><td style="padding:22px 32px 6px;font:400 30px/1.15 ${SERIF};color:${INK};letter-spacing:-0.02em">${escapeHtml(input.heading)}</td></tr>
+<tr><td style="padding:12px 32px 22px">${input.body}</td></tr>
+</table>
+<p style="max-width:520px;margin:16px auto 0;font:400 12px/1.6 ${SANS};color:${MUTED};text-align:center">WebCV · portfolios at webcv.au/you</p>
+</td></tr></table>
+</body></html>`;
 }
 
 export interface EnquiryInput {
@@ -51,12 +114,18 @@ export function enquiryNotification(input: EnquiryInput) {
     input.inboxUrl,
   ].join('\n');
 
-  const html = [
-    `<p>${escapeHtml(input.name)} sent you a message through ${escapeHtml(input.siteName)}.</p>`,
-    `<p>${escapeHtml(details).replace(/\n/g, '<br>')}</p>`,
-    `<blockquote>${escapeHtml(input.message).replace(/\n/g, '<br>')}</blockquote>`,
-    `<p>Reply to this email to answer them directly, or <a href="${escapeHtml(input.inboxUrl)}">open your inbox</a>.</p>`,
-  ].join('');
+  const html = layout({
+    kicker: 'WebCV / New message',
+    heading: `${input.name} wrote to you`,
+    preheader: `${input.name} sent you a message through ${input.siteName}.`,
+    body: [
+      para(`${escapeHtml(input.name)} sent you a message through ${escapeHtml(input.siteName)}.`),
+      para(escapeHtml(details).replace(/\n/g, '<br>'), `font:400 13px/1.6 ${MONO};color:${MUTED}`),
+      `<blockquote style="margin:0 0 18px;padding:14px 16px;background:${PAPER};border-left:3px solid ${INK};font:400 15px/1.6 ${SANS};color:${INK}">${escapeHtml(input.message).replace(/\n/g, '<br>')}</blockquote>`,
+      para('Reply to this email to answer them directly, or open your inbox.'),
+      button(input.inboxUrl, 'Open your inbox'),
+    ].join(''),
+  });
 
   return { subject: `New enquiry from ${input.name}`, text, html };
 }
@@ -79,11 +148,22 @@ export function passphraseReset(input: ResetInput) {
     'worth having.',
   ].join('\n');
 
-  const html = [
-    `<p>Somebody asked to reset the passphrase for ${escapeHtml(input.siteName)}.</p>`,
-    `<p><a href="${escapeHtml(input.resetUrl)}">Choose a new passphrase</a> — the link works once, within ${input.expiresMinutes} minutes.</p>`,
-    `<p>If this was not you, nothing has changed and you can ignore this email.</p>`,
-  ].join('');
+  const html = layout({
+    kicker: 'WebCV / Passphrase reset',
+    heading: 'Choose a new passphrase',
+    preheader: `Reset the passphrase for ${input.siteName}. The link works once.`,
+    body: [
+      para(`Somebody asked to reset the passphrase for ${escapeHtml(input.siteName)}.`),
+      secretLink(input.resetUrl, 'Choose a new passphrase'),
+      para(
+        `The link works once, within ${input.expiresMinutes} minutes.`,
+        `font:400 12px/1.6 ${MONO};color:${MUTED}`
+      ),
+      para(
+        'If this was not you, nothing has changed and you can ignore this email — but somebody knows your address, so a strong passphrase is worth having.'
+      ),
+    ].join(''),
+  });
 
   return { subject: `Reset your ${input.siteName} passphrase`, text, html };
 }
@@ -115,11 +195,20 @@ export function confirmSubscription(input: ConfirmSubscriptionInput) {
     'list yet.',
   ].join('\n');
 
-  const html = [
-    `<p>Somebody — hopefully you — asked to receive updates from ${escapeHtml(input.siteName)}.</p>`,
-    `<p><a href="${escapeHtml(input.confirmUrl)}">Confirm your subscription</a></p>`,
-    `<p>If you do nothing, the request is deleted after ${input.expiresDays} days and you will not hear from this address again. Nobody has been added to any list yet.</p>`,
-  ].join('');
+  const html = layout({
+    kicker: 'WebCV / Confirm',
+    heading: 'Confirm your subscription',
+    preheader: `Confirm you want updates from ${input.siteName}.`,
+    body: [
+      para(
+        `Somebody — hopefully you — asked to receive updates from ${escapeHtml(input.siteName)}.`
+      ),
+      secretLink(input.confirmUrl, 'Confirm your subscription'),
+      para(
+        `If you do nothing, the request is deleted after ${input.expiresDays} days and you will not hear from this address again. Nobody has been added to any list yet.`
+      ),
+    ].join(''),
+  });
 
   return { subject: `Confirm your subscription to ${input.siteName}`, text, html };
 }
@@ -148,11 +237,22 @@ export function signInCode(input: SignInCodeInput) {
     'nothing has changed and you can ignore this email.',
   ].join('\n');
 
-  const html = [
-    `<p>Your sign-in code for ${escapeHtml(input.siteName)} is:</p>`,
-    `<p style="font-size: 24px; letter-spacing: 4px;"><strong>${escapeHtml(input.code)}</strong></p>`,
-    `<p>It works once, within ${input.expiresMinutes} minutes. If this was not you, nothing has changed and you can ignore this email.</p>`,
-  ].join('');
+  const html = layout({
+    kicker: 'WebCV / Sign-in code',
+    heading: 'Your sign-in code',
+    preheader: `${input.code} is your ${input.siteName} sign-in code.`,
+    body: [
+      para(`Enter this code to sign in to ${escapeHtml(input.siteName)}.`),
+      `<div style="margin:8px 0 10px;padding:20px 0;background:${PAPER};border:1px solid ${LINE};border-radius:12px;text-align:center;font:700 34px/1 ${MONO};letter-spacing:10px;color:${INK}">${escapeHtml(input.code)}</div>`,
+      para(
+        `Expires in ${input.expiresMinutes} minutes · works once`,
+        `margin-bottom:20px;font:400 12px/1.6 ${MONO};color:${MUTED};text-align:center`
+      ),
+      para(
+        'If this was not you, nothing has changed and you can ignore this email. Never share this code: WebCV will never ask you for it.'
+      ),
+    ].join(''),
+  });
 
   return { subject: `Your ${input.siteName} sign-in code`, text, html };
 }
@@ -217,17 +317,28 @@ export function monthlyDigest(input: DigestInput) {
     'You get this once a month. To stop it, set OPB_DIGEST=off in your hosting settings.',
   ].join('\n');
 
-  const html = [
-    `<p>Your ${escapeHtml(input.month)} on ${escapeHtml(input.siteName)}:</p>`,
-    `<ul>${lines.map((line) => `<li>${escapeHtml(line)}</li>`).join('')}</ul>`,
-    input.todo.length
-      ? `<p>Still to do before your site is fully launched:</p><ul>${input.todo
-          .map((step) => `<li><a href="${escapeHtml(step.url)}">${escapeHtml(step.label)}</a></li>`)
-          .join('')}</ul>`
-      : '',
-    `<p><a href="${escapeHtml(input.adminUrl)}">Open your admin</a></p>`,
-    '<p style="color:#666;font-size:12px">You get this once a month. To stop it, set OPB_DIGEST=off in your hosting settings.</p>',
-  ].join('');
+  const html = layout({
+    kicker: `WebCV / ${input.month}`,
+    heading: `Your ${input.month} on ${input.siteName}`,
+    preheader: lines[0] ?? `Your ${input.month} on ${input.siteName}`,
+    body: [
+      `<ul style="margin:0 0 18px;padding-left:20px;font:400 15px/1.7 ${SANS};color:${BODY}">${lines.map((line) => `<li>${escapeHtml(line)}</li>`).join('')}</ul>`,
+      input.todo.length
+        ? para('Still to do before your site is fully launched:') +
+          `<ul style="margin:0 0 18px;padding-left:20px;font:400 15px/1.7 ${SANS}">${input.todo
+            .map(
+              (step) =>
+                `<li><a href="${escapeHtml(step.url)}" style="color:${INK}">${escapeHtml(step.label)}</a></li>`
+            )
+            .join('')}</ul>`
+        : '',
+      button(input.adminUrl, 'Open your admin'),
+      para(
+        'You get this once a month. To stop it, set OPB_DIGEST=off in your hosting settings.',
+        `font:400 12px/1.6 ${SANS};color:${MUTED}`
+      ),
+    ].join(''),
+  });
 
   const subject =
     input.newMessages > 0
