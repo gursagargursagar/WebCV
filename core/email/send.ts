@@ -67,10 +67,11 @@ export async function sendMail(input: MailInput): Promise<SendResult> {
     });
     return { ok: true };
   } catch (err) {
-    return {
-      ok: false,
-      reason: 'failed',
-      detail: err instanceof Error ? err.message : 'The mail server rejected the message.',
-    };
+    const detail = err instanceof Error ? err.message : 'The mail server rejected the message.';
+    // Sign-in and reset requests answer "sent" whatever happens, so nobody can
+    // learn which emails have accounts. That makes this log line the only
+    // place a failed send shows up.
+    console.error('[email] Send failed:', detail);
+    return { ok: false, reason: 'failed', detail };
   }
 }
