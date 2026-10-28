@@ -63,7 +63,7 @@ export function LoginForm({
         go();
         return;
       }
-      setError(data.error ?? 'That email or passphrase is not right.');
+      setError(data.error ?? 'That email or password is not right.');
     } catch {
       setError('Could not reach the server.');
     } finally {
@@ -246,7 +246,7 @@ export function LoginForm({
       <div>
         <h1 className="m-0 font-display text-3xl font-semibold">Sign in</h1>
         <p className="m-0 mt-1 text-sm text-text-secondary">
-          {demoHint ?? 'Use the email and passphrase you signed up with.'}
+          {demoHint ?? 'Use the email and password you signed up with.'}
         </p>
       </div>
 
@@ -272,7 +272,7 @@ export function LoginForm({
         </label>
 
         <label className="grid gap-1 text-sm">
-          <span className="font-semibold">Passphrase</span>
+          <span className="font-semibold">Password</span>
           <input
             type="password"
             name="password"
@@ -352,7 +352,7 @@ export function LoginForm({
           href="/admin/reset"
           className="text-text-secondary underline-offset-4 hover:text-text-primary hover:underline"
         >
-          Forgot your passphrase?
+          Forgot your password?
         </Link>
         <Link
           href="/"

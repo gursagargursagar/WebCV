@@ -27,7 +27,7 @@ export async function POST(req: Request) {
   // this browser has not said which. That is "no passkeys here", not a fault.
   if (isMultiSite() && !(await currentSite())) {
     return NextResponse.json(
-      { ok: false, error: 'Sign in with your email and passphrase first on this device.' },
+      { ok: false, error: 'Sign in with your email and password first on this device.' },
       { status: body?.autofill === true ? 200 : 400 }
     );
   }

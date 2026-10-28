@@ -184,7 +184,7 @@ export function SignupForm({ initialSlug, claim = '' }: { initialSlug: string; c
       </div>
 
       <div className="wc-field">
-        <label htmlFor={`${id}-pass`}>Passphrase</label>
+        <label htmlFor={`${id}-pass`}>Password</label>
         <div className="wc-affix" data-invalid={errors.passphrase ? true : undefined}>
           <input
             ref={passRef}
@@ -205,7 +205,7 @@ export function SignupForm({ initialSlug, claim = '' }: { initialSlug: string; c
             type="button"
             className="wc-reveal"
             onClick={() => setShow((v) => !v)}
-            aria-label={show ? 'Hide passphrase' : 'Show passphrase'}
+            aria-label={show ? 'Hide password' : 'Show password'}
             aria-controls={`${id}-pass`}
           >
             {show ? 'Hide' : 'Show'}

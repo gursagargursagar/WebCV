@@ -85,7 +85,7 @@ describe('login with nothing enrolled', () => {
     const started = await startPasskeyLogin('localhost');
     expect(started).toEqual({
       ok: false,
-      error: 'No passkeys are enrolled yet. Sign in with your passphrase.',
+      error: 'No passkeys are enrolled yet. Sign in with your password.',
     });
   });
 });

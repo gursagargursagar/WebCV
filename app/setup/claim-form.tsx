@@ -109,7 +109,7 @@ export function ClaimForm({
           htmlFor="setup-passphrase"
           className="mb-2 block font-body text-xs font-medium uppercase tracking-wider text-text-muted"
         >
-          Passphrase
+          Password
         </label>
         <input
           id="setup-passphrase"

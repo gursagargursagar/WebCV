@@ -4,7 +4,7 @@ import { ResetForm } from './reset-form';
 // Request-time by nature (Cache Components may block here). A token in the address decides everything here.
 // (`instant = false` removed: WebCV runs without Cache Components.)
 
-export const metadata: Metadata = { title: 'Reset your passphrase' };
+export const metadata: Metadata = { title: 'Reset your password' };
 
 /**
  * The mailed link lands here with `?token=`; the same page without one is the

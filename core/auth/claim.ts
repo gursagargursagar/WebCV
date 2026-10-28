@@ -99,7 +99,7 @@ export async function claimInstance(
   }
 
   const strength = checkPassphraseStrength(input.passphrase);
-  if (!strength.ok) return { ok: false, error: strength.reason ?? 'Choose a stronger passphrase.' };
+  if (!strength.ok) return { ok: false, error: strength.reason ?? 'Choose a stronger password.' };
 
   // Refused when it has appeared in a breach (k-anonymity: only a 5-char hash
   // prefix leaves this machine). Fail-open when the check itself is
@@ -109,8 +109,7 @@ export async function claimInstance(
   if (breached) {
     return {
       ok: false,
-      error:
-        'That passphrase has appeared in a data breach. Choose one you have not used elsewhere.',
+      error: 'That password has appeared in a data breach. Choose one you have not used elsewhere.',
     };
   }
 

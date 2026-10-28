@@ -39,7 +39,7 @@ export async function POST(req: Request) {
 
   if ((await isBreachedPassphrase(passphrase)).breached) {
     return NextResponse.json(
-      { ok: false, error: 'That passphrase has appeared in a data breach. Choose another.' },
+      { ok: false, error: 'That password has appeared in a data breach. Choose another.' },
       { status: 400 }
     );
   }

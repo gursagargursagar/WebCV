@@ -91,9 +91,9 @@ export async function POST(req: Request) {
     return fail('email', 'That does not look like an email address.');
   }
   const strength = checkPassphraseStrength(passphrase);
-  if (!strength.ok) return fail('passphrase', strength.reason ?? 'Choose a stronger passphrase.');
+  if (!strength.ok) return fail('passphrase', strength.reason ?? 'Choose a stronger password.');
   if ((await isBreachedPassphrase(passphrase)).breached) {
-    return fail('passphrase', 'That passphrase has appeared in a data breach. Choose another.');
+    return fail('passphrase', 'That password has appeared in a data breach. Choose another.');
   }
 
   if (await siteBySlug(slug)) return fail('slug', 'That address is taken.', 409);

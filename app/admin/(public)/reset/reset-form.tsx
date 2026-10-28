@@ -91,9 +91,9 @@ export function ResetForm({ token }: { token?: string }) {
     return (
       <form onSubmit={(event) => void confirm(event)} className="grid gap-5">
         <div>
-          <h1 className="font-display text-2xl font-semibold">Choose a new passphrase</h1>
+          <h1 className="font-display text-2xl font-semibold">Choose a new password</h1>
           <p className="m-0 mt-1 text-sm text-text-secondary">
-            This link works once. Setting a passphrase signs you in here and signs out every other
+            This link works once. Setting a password signs you in here and signs out every other
             session.
           </p>
         </div>
@@ -105,7 +105,7 @@ export function ResetForm({ token }: { token?: string }) {
         ) : null}
 
         <label className="grid gap-1 text-sm">
-          <span className="font-semibold">New passphrase</span>
+          <span className="font-semibold">New password</span>
           <input
             type="password"
             name="password"
@@ -127,7 +127,7 @@ export function ResetForm({ token }: { token?: string }) {
           className="rounded-full bg-text-primary font-semibold text-bg disabled:opacity-50"
           style={{ minHeight: 48 }}
         >
-          {loading ? 'Saving…' : 'Set passphrase and sign in'}
+          {loading ? 'Saving…' : 'Set password and sign in'}
         </button>
 
         <BackToSignIn />
@@ -153,7 +153,7 @@ export function ResetForm({ token }: { token?: string }) {
   return (
     <form onSubmit={(event) => void request(event)} className="grid gap-5">
       <div>
-        <h1 className="font-display text-2xl font-semibold">Reset your passphrase</h1>
+        <h1 className="font-display text-2xl font-semibold">Reset your password</h1>
         <p className="m-0 mt-1 text-sm text-text-secondary">
           Enter the email you used to claim this site.
         </p>

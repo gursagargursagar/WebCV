@@ -33,7 +33,7 @@ async function handle(req: Request) {
   // One message for every kind of failure, and the passphrase is verified even
   // when there is no owner, so neither the wording nor the response time
   // reveals whether an account exists.
-  const generic = { ok: false as const, error: 'That email or passphrase is not right.' };
+  const generic = { ok: false as const, error: 'That email or password is not right.' };
 
   if (!owner) {
     await verifyPassphrase(passphrase, DUMMY_HASH);

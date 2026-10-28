@@ -27,7 +27,7 @@ export async function POST(req: Request) {
   const body = (await req.json().catch(() => null)) as Record<string, string> | null;
   if (!body?.email || !body?.passphrase) {
     return NextResponse.json(
-      { ok: false, error: 'Email and passphrase are both required.' },
+      { ok: false, error: 'Email and password are both required.' },
       { status: 400 }
     );
   }

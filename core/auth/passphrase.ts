@@ -39,7 +39,7 @@ export async function hashPassphrase(passphrase: string): Promise<string> {
 
 /**
  * Always does the full derivation, even against a malformed stored hash, so the
- * time taken cannot distinguish "no such account" from "wrong passphrase".
+ * time taken cannot distinguish "no such account" from "wrong password".
  */
 export async function verifyPassphrase(passphrase: string, stored: string): Promise<boolean> {
   const parts = stored.split('$');

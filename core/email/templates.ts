@@ -138,34 +138,34 @@ export interface ResetInput {
 
 export function passphraseReset(input: ResetInput) {
   const text = [
-    `Somebody asked to reset the passphrase for ${input.siteName}.`,
+    `Somebody asked to reset the password for ${input.siteName}.`,
     '',
     `Open this link within ${input.expiresMinutes} minutes to choose a new one:`,
     input.resetUrl,
     '',
     'It works once. If this was not you, nothing has changed and you can ignore',
-    'this email — but somebody knows your address, so a strong passphrase is',
+    'this email — but somebody knows your address, so a strong password is',
     'worth having.',
   ].join('\n');
 
   const html = layout({
-    kicker: 'WebCV / Passphrase reset',
-    heading: 'Choose a new passphrase',
-    preheader: `Reset the passphrase for ${input.siteName}. The link works once.`,
+    kicker: 'WebCV / Password reset',
+    heading: 'Choose a new password',
+    preheader: `Reset the password for ${input.siteName}. The link works once.`,
     body: [
-      para(`Somebody asked to reset the passphrase for ${escapeHtml(input.siteName)}.`),
-      secretLink(input.resetUrl, 'Choose a new passphrase'),
+      para(`Somebody asked to reset the password for ${escapeHtml(input.siteName)}.`),
+      secretLink(input.resetUrl, 'Choose a new password'),
       para(
         `The link works once, within ${input.expiresMinutes} minutes.`,
         `font:400 12px/1.6 ${MONO};color:${MUTED}`
       ),
       para(
-        'If this was not you, nothing has changed and you can ignore this email — but somebody knows your address, so a strong passphrase is worth having.'
+        'If this was not you, nothing has changed and you can ignore this email — but somebody knows your address, so a strong password is worth having.'
       ),
     ].join(''),
   });
 
-  return { subject: `Reset your ${input.siteName} passphrase`, text, html };
+  return { subject: `Reset your ${input.siteName} password`, text, html };
 }
 
 export interface ConfirmSubscriptionInput {

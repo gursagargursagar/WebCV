@@ -46,7 +46,7 @@ async function handle(req: Request) {
         ok: false,
         error:
           'Email is not configured on this site, so no code can arrive. Sign in with your ' +
-          'passphrase instead, then connect a mail server from the admin.',
+          'password instead, then connect a mail server from the admin.',
       },
       { status: 503 }
     );

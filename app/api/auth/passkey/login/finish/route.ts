@@ -38,7 +38,7 @@ export async function POST(req: Request) {
     typeof body.response !== 'object'
   ) {
     return NextResponse.json(
-      { ok: false, error: 'That passkey did not work. Try again or use your passphrase.' },
+      { ok: false, error: 'That passkey did not work. Try again or use your password.' },
       { status: 401 }
     );
   }
@@ -53,7 +53,7 @@ export async function POST(req: Request) {
   const owner = await (await getStorageAdapter()).readOwner();
   if (!owner || owner.email !== result.email) {
     return NextResponse.json(
-      { ok: false, error: 'That passkey did not work. Try again or use your passphrase.' },
+      { ok: false, error: 'That passkey did not work. Try again or use your password.' },
       { status: 401 }
     );
   }

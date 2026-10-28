@@ -182,7 +182,7 @@ export async function startPasskeyLogin(
   const adapter = await getStorageAdapter();
   const enrolled = await adapter.passkeys.list();
   if (enrolled.length === 0) {
-    return { ok: false, error: 'No passkeys are enrolled yet. Sign in with your passphrase.' };
+    return { ok: false, error: 'No passkeys are enrolled yet. Sign in with your password.' };
   }
   const options = await generateAuthenticationOptions({
     rpID,
@@ -198,7 +198,7 @@ export async function startPasskeyLogin(
 }
 
 /** One message for every failure mode. See the file comment. */
-export const PASSKEY_LOGIN_FAILED = 'That passkey did not work. Try again or use your passphrase.';
+export const PASSKEY_LOGIN_FAILED = 'That passkey did not work. Try again or use your password.';
 
 export async function finishPasskeyLogin(
   challengeId: string,

@@ -89,7 +89,7 @@ export function PasskeyPanel({ initial }: { initial: PasskeySummary[] }) {
     try {
       await fetch(`/api/auth/passkey/${encodeURIComponent(id)}`, { method: 'DELETE' });
       await refresh();
-      setStatus('Passkey removed. Your passphrase still signs in.');
+      setStatus('Passkey removed. Your password still signs in.');
     } finally {
       setBusy(false);
       setRemoveArmed(null);
@@ -101,9 +101,8 @@ export function PasskeyPanel({ initial }: { initial: PasskeySummary[] }) {
       <div>
         <h2 className="m-0 text-xl">Passkeys</h2>
         <p className="m-0 mt-1 text-sm text-text-secondary">
-          A fingerprint, face or hardware key instead of a typed passphrase. Enroll this device
-          here; use it on the sign-in page. Removing every passkey is safe — your passphrase still
-          works.
+          A fingerprint, face or hardware key instead of a typed password. Enroll this device here;
+          use it on the sign-in page. Removing every passkey is safe — your password still works.
         </p>
       </div>
 
@@ -159,7 +158,7 @@ export function PasskeyPanel({ initial }: { initial: PasskeySummary[] }) {
         </ul>
       ) : (
         <p className="m-0 text-sm text-text-secondary">
-          No passkeys yet. Your passphrase is the only way in.
+          No passkeys yet. Your password is the only way in.
         </p>
       )}
 
