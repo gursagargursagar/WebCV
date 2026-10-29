@@ -252,24 +252,21 @@ export default async function DeclarationPage({
                   Sign in to myGov with a Digital ID (such as myID) at Standard or Strong strength.
                 </li>
                 <li>
-                  Start a Commonwealth statutory declaration — myGov&apos;s{' '}
-                  <a href={MYGOV_HELP} target="_blank" rel="noreferrer">
-                    step-by-step help
-                  </a>{' '}
-                  shows where.
+                  Start a Commonwealth statutory declaration — the button below opens myGov&apos;s
+                  page for it.
                 </li>
                 <li>Paste the statements exactly as above. Do not add or change anything.</li>
                 <li>Finish the declaration and download the PDF myGov gives you.</li>
               </ol>
               <div>
                 <a
-                  href="https://my.gov.au/"
+                  href={MYGOV_HELP}
                   target="_blank"
                   rel="noreferrer"
                   className="rounded-full border border-border px-4 text-sm text-text-secondary no-underline"
                   style={{ display: 'inline-flex', minHeight: 44, alignItems: 'center' }}
                 >
-                  Open myGov
+                  Open myGov statutory declarations
                 </a>
               </div>
             </section>
