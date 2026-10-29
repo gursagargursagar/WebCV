@@ -241,7 +241,9 @@ export const config = {
    */
   matcher: [
     '/admin/:path*',
-    // Static files (images, the hand-built /gursagar24 page's assets) never need the proxy.
-    '/((?!_next/static|_next/image|favicon.ico|gursagar24/img/|.*\\.(?:png|jpe?g|gif|webp|avif|svg|ico|woff2?)$).*)',
+    // Static files (images, the hand-built /gursagar24 page's assets) never need the proxy —
+    // except uploads, `/<site>/api/media/photo.jpg`, which only the proxy can send to the
+    // right portfolio's storage. Skipping them broke every uploaded image.
+    '/((?!_next/static|_next/image|favicon.ico|gursagar24/img/|(?!(?:.*/)?api/media/).*\\.(?:png|jpe?g|gif|webp|avif|svg|ico|woff2?)$).*)',
   ],
 };
