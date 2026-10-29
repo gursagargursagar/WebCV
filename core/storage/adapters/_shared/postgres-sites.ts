@@ -674,3 +674,38 @@ export function makeSubscribersAdapter(getConnection: () => Sql): SubscribersAda
     },
   };
 }
+
+/* ------------------------------------------------------------------- move */
+
+/** Every table that is keyed by a portfolio's address. */
+const SITE_TABLES = [
+  'wc_content',
+  'wc_owner',
+  'wc_kv',
+  'wc_subscribers',
+  'wc_messages',
+  'wc_passkeys',
+  'wc_records',
+  'wc_singletons',
+] as const;
+
+export class SiteMoveError extends Error {}
+
+/**
+ * Moves a portfolio — its owner, content, sessions, messages, everything —
+ * to a new address, in one transaction. The old address becomes free.
+ */
+export async function moveSiteRows(sql: Sql, from: string, to: string): Promise<void> {
+  await sql.begin(async (tx) => {
+    const [taken] = await tx`SELECT 1 AS x FROM wc_sites WHERE slug = ${to}`;
+    if (taken) throw new SiteMoveError(`webcv.au/${to} is already taken.`);
+    const moved = await tx`UPDATE wc_sites SET slug = ${to} WHERE slug = ${from} RETURNING slug`;
+    if (moved.length === 0) throw new SiteMoveError('That portfolio no longer exists.');
+    for (const table of SITE_TABLES) {
+      await tx`UPDATE ${tx(table)} SET site = ${to} WHERE site = ${from}`;
+    }
+    // Created on first use, so it may not exist yet.
+    const [declarations] = await tx`SELECT to_regclass('wc_declarations') AS t`;
+    if (declarations?.t) await tx`UPDATE wc_declarations SET site = ${to} WHERE site = ${from}`;
+  });
+}

@@ -3,6 +3,10 @@ import { getPublishedContentFresh } from '@/core/content/read';
 import { resolveSiteUrl } from '@/core/content/metadata';
 import { CopyAddress } from './copy-address';
 import { isMultiSite } from '@/core/site/constants';
+import { requireOwner } from '@/core/auth/guard';
+import { currentSite } from '@/core/site/tenant';
+import { heldAddressFor } from '@/core/site/move';
+import { MoveToHeld } from './move-to-held';
 
 export const metadata: Metadata = {
   title: 'Your site',
@@ -87,6 +91,9 @@ export default async function YourSitePage() {
   );
   const hasPublished = Boolean(content.lastPublishedAt);
   const multi = isMultiSite();
+  // WebCV: an address held for this owner (core/site/move.ts) they can move to.
+  const site = multi ? await currentSite() : null;
+  const held = site ? await heldAddressFor((await requireOwner()).email, site) : null;
 
   return (
     <div className="grid gap-5" style={{ maxWidth: 'var(--measure)' }}>
@@ -98,6 +105,23 @@ export default async function YourSitePage() {
             : 'The address to put on your CV, and how to swap it for one of your own.'}
         </p>
       </div>
+
+      {held ? (
+        <section
+          aria-labelledby="held-title"
+          className="grid gap-3 rounded-2xl border border-border p-4"
+        >
+          <h2 id="held-title" className="m-0 text-xl">
+            webcv.au/{held} is waiting for you
+          </h2>
+          <p className="m-0 text-sm text-text-secondary">
+            This account can move to webcv.au/{held}, with the portfolio prepared for that address
+            already in your Studio. Your sign-in, messages and uploads come with you; your current
+            Studio design is kept as a backup. webcv.au/{site} stops working.
+          </p>
+          <MoveToHeld slug={held} />
+        </section>
+      ) : null}
 
       {url ? (
         <div className="grid gap-3">

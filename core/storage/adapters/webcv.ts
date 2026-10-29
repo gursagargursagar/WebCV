@@ -1,5 +1,5 @@
 import 'server-only';
-import { BlobNotFoundError, del, head, list, put } from '@vercel/blob';
+import { BlobNotFoundError, copy, del, head, list, put } from '@vercel/blob';
 import type { MediaAdapter, StorageAdapter } from '../contract';
 import { AdapterConfigError } from '../contract';
 import { requireSite } from '@/core/site/tenant';
@@ -71,6 +71,31 @@ function blobToken(): string {
  */
 async function scoped(key: string): Promise<string> {
   return `${await requireSite()}/${key.replace(/^\/+/, '')}`;
+}
+
+/**
+ * Copies one portfolio's uploads to another address, for a move. The
+ * originals stay where they were until someone removes them.
+ */
+export async function copySiteMedia(from: string, to: string): Promise<number> {
+  // No Blob store (a local database without uploads): nothing to copy.
+  if (!process.env.BLOB_READ_WRITE_TOKEN) return 0;
+  let copied = 0;
+  let cursor: string | undefined;
+  do {
+    const page = await list({ token: blobToken(), prefix: `${from}/`, cursor });
+    for (const blob of page.blobs) {
+      await copy(blob.url, `${to}/${blob.pathname.slice(from.length + 1)}`, {
+        access: 'public',
+        token: blobToken(),
+        addRandomSuffix: false,
+        allowOverwrite: true,
+      });
+      copied++;
+    }
+    cursor = page.hasMore ? page.cursor : undefined;
+  } while (cursor);
+  return copied;
 }
 
 const media: MediaAdapter = {
