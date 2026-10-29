@@ -709,3 +709,15 @@ export async function moveSiteRows(sql: Sql, from: string, to: string): Promise<
     if (declarations?.t) await tx`UPDATE wc_declarations SET site = ${to} WHERE site = ${from}`;
   });
 }
+
+/**
+ * Undoes a sign-up that failed halfway: the address row and whatever was
+ * written under it. Without it the address and the email stay claimed by a
+ * portfolio with no owner, and the person can neither sign in nor try again.
+ */
+export async function deleteSiteRows(sql: Sql, slug: string): Promise<void> {
+  await sql.begin(async (tx) => {
+    for (const table of SITE_TABLES) await tx`DELETE FROM ${tx(table)} WHERE site = ${slug}`;
+    await tx`DELETE FROM wc_sites WHERE slug = ${slug}`;
+  });
+}

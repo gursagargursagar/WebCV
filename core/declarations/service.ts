@@ -4,6 +4,7 @@ import {
   cancelPayment,
   capturePayment,
   retrieveCheckout,
+  retrievePayment,
   StripeError,
 } from '@/core/payments/stripe';
 import { finishReview, getDeclaration, markSubmitted, type Declaration } from './store';
@@ -52,7 +53,8 @@ export async function syncCheckout(declaration: Declaration): Promise<Declaratio
       intent?.status === 'requires_capture' &&
       intent.amount === declaration.priceCents
     ) {
-      await markSubmitted(declaration.id, intent.id);
+      const heldAt = intent.created ? new Date(intent.created * 1000) : undefined;
+      await markSubmitted(declaration.id, intent.id, heldAt);
       return (await getDeclaration(declaration.id)) ?? declaration;
     }
   } catch (err) {
@@ -83,8 +85,22 @@ export async function approveDeclaration(
     }
   } catch (err) {
     if (!(err instanceof StripeError)) throw err;
+    // "Unexpected state" is also what Stripe says to a second capture, once
+    // the idempotent replay has gone (24 hours) — a retry after the review
+    // record failed to save. That payment was taken; it must not read lapsed.
+    const intent =
+      err.code === 'payment_intent_unexpected_state'
+        ? await retrievePayment(declaration.paymentId).catch(() => null)
+        : null;
+    const alreadyTaken = intent?.status === 'succeeded';
     const expired =
-      err.code === 'charge_expired_for_capture' || err.code === 'payment_intent_unexpected_state';
+      !alreadyTaken &&
+      (err.code === 'charge_expired_for_capture' ||
+        (err.code === 'payment_intent_unexpected_state' && intent?.status === 'canceled'));
+    if (alreadyTaken) {
+      await finishReview(id, { status: 'approved', mygovRef, declaredOn }, reviewer);
+      return { ok: true, status: 'approved' };
+    }
     if (!expired) return { ok: false, error: `Stripe said: ${err.message}` };
     // An authorisation that has run out cannot be captured. Nobody was
     // charged; tell the owner to submit again.

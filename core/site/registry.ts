@@ -3,6 +3,7 @@ import { getStorageAdapter } from '@/core/storage/registry';
 import { sitesSql } from '@/core/storage/adapters/webcv';
 import {
   countSites,
+  deleteSiteRows,
   findSiteByEmail,
   findSiteBySlug,
   insertSite,
@@ -49,6 +50,11 @@ export async function siteByEmail(email: string): Promise<SiteRow | null> {
 
 export async function registerSite(slug: string, email: string) {
   return insertSite(await ready(), slug, email.trim().toLowerCase());
+}
+
+/** Frees an address whose sign-up did not finish; see `deleteSiteRows`. */
+export async function unregisterSite(slug: string): Promise<void> {
+  await deleteSiteRows(await ready(), slug);
 }
 
 /** Portfolios a search engine should know about; see `listPublishedSites`. */

@@ -5,7 +5,9 @@ import { issueResetToken, resetUrlBase, RESET_TTL_MINUTES } from '@/core/auth/re
 import { getPublishedContent } from '@/core/content/read';
 import { MAX_EMAIL_LENGTH, sendMail } from '@/core/email/send';
 import { passphraseReset } from '@/core/email/templates';
+import { isMultiSite } from '@/core/site/constants';
 import { bySiteOfEmail } from '@/core/site/registry';
+import { currentSite } from '@/core/site/tenant';
 
 async function handle(req: Request) {
   try {
@@ -56,9 +58,13 @@ async function handle(req: Request) {
   const token = await issueResetToken(email);
   if (token) {
     const content = await getPublishedContent();
+    // WebCV: the link names the portfolio. Opened in another browser or a
+    // mail app's own, there is no wc_site cookie to say which site's token
+    // store to look in — `/<slug>/admin/...` sets it on the way through.
+    const site = isMultiSite() ? await currentSite() : null;
     const mail = passphraseReset({
       siteName: content.settings?.fullName || content.seo?.siteTitle || 'your site',
-      resetUrl: `${base}/admin/reset?token=${encodeURIComponent(token)}`,
+      resetUrl: `${base}${site ? `/${site}` : ''}/admin/reset?token=${encodeURIComponent(token)}`,
       expiresMinutes: RESET_TTL_MINUTES,
     });
     await sendMail({ to: email, ...mail });

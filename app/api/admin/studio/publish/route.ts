@@ -50,7 +50,7 @@ export async function POST(req: Request) {
     );
   }
 
-  const published = await publishDraft();
+  const published = await publishDraft(draft.site);
   const site = await currentSite();
   // Tell the search engines that listen (Bing and friends) once the response
   // is on its way; Google picks the change up from the sitemap.

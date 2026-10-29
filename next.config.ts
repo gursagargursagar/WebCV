@@ -72,6 +72,15 @@ const nextConfig: NextConfig = {
    */
   serverExternalPackages: ['miniflare', '@cloudflare/workerd-*'],
 
+  /*
+   * The admin uploads images through a server action, and an action's body is
+   * capped at 1 MB by default — under most phone photos. 4 MB stays inside
+   * Vercel's 4.5 MB request limit with room for the multipart framing.
+   */
+  experimental: {
+    serverActions: { bodySizeLimit: '4mb' },
+  },
+
   async redirects() {
     return [
       {

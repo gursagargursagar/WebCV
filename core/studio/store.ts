@@ -36,12 +36,17 @@ export async function writeDraft(site: StudioSite, expectedRevision: number): Pr
   return record.revision;
 }
 
-export async function publishDraft(): Promise<StudioSite | null> {
-  const draft = await readStudio('draft');
-  if (!draft) return null;
+/**
+ * Publishes the draft — the copy the caller already read and checked the
+ * revision of, when it passes one, so an autosave landing in between cannot
+ * slip an unchecked version onto the live site.
+ */
+export async function publishDraft(checked?: StudioSite): Promise<StudioSite | null> {
+  const site = checked ?? (await readStudio('draft'))?.site;
+  if (!site) return null;
   const adapter = await getStorageAdapter();
-  await adapter.records.put(COLLECTION, 'published', draft.site);
-  return draft.site;
+  await adapter.records.put(COLLECTION, 'published', site);
+  return site;
 }
 
 export async function unpublish(): Promise<void> {

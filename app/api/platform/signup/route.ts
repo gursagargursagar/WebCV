@@ -11,7 +11,7 @@ import { clientKey, rateLimit } from '@/core/auth/ratelimit';
 import { createSession } from '@/core/auth/session';
 import { MAX_EMAIL_LENGTH } from '@/core/email/send';
 import { isMultiSite, isValidSlug } from '@/core/site/constants';
-import { registerSite, siteByEmail, siteBySlug } from '@/core/site/registry';
+import { registerSite, siteByEmail, siteBySlug, unregisterSite } from '@/core/site/registry';
 import { claimMatches, heldSeed, isHeldSlug } from '@/core/site/claims';
 import { runWithSite } from '@/core/site/tenant';
 import { WEBCV_THEME_ID } from '@/core/theme/presets';
@@ -105,6 +105,31 @@ export async function POST(req: Request) {
   if (claimed === 'slug-taken') return fail('slug', 'That address was just taken.', 409);
   if (claimed === 'email-taken') return fail('email', 'That email already has a portfolio.', 409);
 
+  try {
+    await createPortfolio(req, slug, name, email, passphrase);
+  } catch (err) {
+    // Half a portfolio is worse than none: the address and the email would
+    // stay claimed by a site nobody can sign in to. Give both back.
+    console.error('[signup] Creating the portfolio failed; undoing.', err);
+    await unregisterSite(slug).catch((undo) =>
+      console.error('[signup] Could not undo the half-made portfolio.', slug, undo)
+    );
+    return NextResponse.json(
+      { ok: false, error: 'Something went wrong making your portfolio. Try again.' },
+      { status: 500 }
+    );
+  }
+
+  return NextResponse.json({ ok: true, slug });
+}
+
+async function createPortfolio(
+  req: Request,
+  slug: string,
+  name: string,
+  email: string,
+  passphrase: string
+): Promise<void> {
   await runWithSite(slug, async () => {
     const adapter = await getStorageAdapter();
     const now = new Date().toISOString();
@@ -139,6 +164,4 @@ export async function POST(req: Request) {
     }
     await createSession(email, 1);
   });
-
-  return NextResponse.json({ ok: true, slug });
 }

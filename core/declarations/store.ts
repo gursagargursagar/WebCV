@@ -268,11 +268,20 @@ export async function setCheckout(
 }
 
 /** The card is held: into the review queue. Idempotent. */
-export async function markSubmitted(id: string, paymentId: string): Promise<boolean> {
+/**
+ * `heldAt` is when the card was authorised. The review deadline counts from
+ * it, not from whenever WebCV noticed the hold — which, for an owner who closed
+ * the tab at Stripe, may be days later, with the hold already running out.
+ */
+export async function markSubmitted(
+  id: string,
+  paymentId: string,
+  heldAt?: Date
+): Promise<boolean> {
   const sql = await db();
   const rows = await sql`
     UPDATE wc_declarations SET status = 'submitted', payment_id = ${paymentId},
-      submitted_at = now(), updated_at = now()
+      submitted_at = COALESCE(${heldAt ?? null}::timestamptz, now()), updated_at = now()
     WHERE id = ${id} AND status = 'ready' AND pdf IS NOT NULL
     RETURNING id
   `;

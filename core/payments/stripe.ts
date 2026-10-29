@@ -108,6 +108,8 @@ export interface PaymentIntent {
     | 'canceled'
     | 'succeeded';
   amount: number;
+  /** Unix seconds. For a held card, when the hold's ~7-day clock started. */
+  created?: number;
   metadata?: Record<string, string>;
 }
 
@@ -171,6 +173,10 @@ export function retrieveCheckout(id: string): Promise<CheckoutSession> {
   return call<CheckoutSession>('GET', `/v1/checkout/sessions/${encodeURIComponent(id)}`, {
     expand: ['payment_intent'],
   });
+}
+
+export function retrievePayment(id: string): Promise<PaymentIntent> {
+  return call<PaymentIntent>('GET', `/v1/payment_intents/${encodeURIComponent(id)}`, {});
 }
 
 export function capturePayment(id: string): Promise<PaymentIntent> {
